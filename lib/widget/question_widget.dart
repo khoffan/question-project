@@ -1,31 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:questionnaire_project/model/question_model.dart';
 import 'package:questionnaire_project/widget/choice_answer_widget.dart';
 import 'package:questionnaire_project/widget/level_pain_answer_widget.dart';
 import 'package:questionnaire_project/widget/yes_no_question_widget.dart';
-
-class Question {
-  final String numberQuestion;
-  final String question;
-  final String questionHighlight;
-  final String labelLeft;
-  final String labelRight;
-  final bool isYesnoQuestion;
-  final bool useChoice;
-  final bool showSubQuestionOnYes;
-  final List<Question> subQuestions;
-
-  Question({
-    required this.numberQuestion,
-    required this.question,
-    required this.questionHighlight,
-    this.labelLeft = "",
-    this.labelRight = "",
-    this.isYesnoQuestion = false,
-    this.useChoice = false,
-    this.showSubQuestionOnYes = false,
-    this.subQuestions = const [],
-  });
-}
 
 class QuestionWidget extends StatefulWidget {
   const QuestionWidget({super.key, required this.question, this.onAnswer});
@@ -167,7 +144,14 @@ class _QuestionWidgetState extends State<QuestionWidget> {
     }
     final end = start + hightlight.length;
     return [
-      TextSpan(text: "${question.numberQuestion}. "),
+      TextSpan(
+        text: "${question.numberQuestion}. ",
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          decoration: TextDecoration.underline,
+        ),
+      ),
       TextSpan(text: question.question.substring(0, start)),
       TextSpan(
         text: question.question.substring(start, end),

@@ -1,0 +1,86 @@
+[
+    {
+        "numberQuestion": "1",
+        "question": "Please select the number that best describes your pain on average in the last 7 days.",
+        "questionHighlight": "your pain on average",
+        "labelLeft": "No Pain",
+        "labelRight": "Extreme Pain"
+    },
+    {
+        "numberQuestion": "2",
+        "question": "Please select the number that best describes your pain at its worst in the last 7 days.",
+        "questionHighlight": "your pain at its worst",
+        "labelLeft": "No Pain",
+        "labelRight": "Extreme Pain"
+    },
+    {
+        "numberQuestion": "3",
+        "question": "Please choose the picture(s) that best describe(s) your experience of pain in the last 7 days.",
+        "questionHighlight": "your experience of pain",
+        "useChoice": true
+    },
+    {
+        "numberQuestion": "5a",
+        "question": "Please select the number that best describes your pain on average in the last 7 days.",
+        "questionHighlight": "your pain on average",
+        "isYesnoQuestion": true,
+        "showSubQuestionOnYes": true,
+        "subQuestions": [
+            {
+                "numberQuestion": "5b",
+                "question": "Please select the number that best describes this burning sensation at its worst in the last 7 days.",
+                "questionHighlight": "this burning sensation at its worst",
+                "labelLeft": "No burning sensation",
+                "labelRight": "Extreme burning sensation"
+            }
+        ]
+    },
+    {
+        "numberQuestion": "6a",
+        "question": "Have you experienced tingling in the last 7 days?",
+        "questionHighlight": "tingling",
+        "isYesnoQuestion": true,
+        "showSubQuestionOnYes": true,
+        "subQuestions": [
+            {
+                "numberQuestion": "6b",
+                "question": "Please select the number that best describes this tingling at its worst in the last 7 days.",
+                "questionHighlight": "this tingling at its worst",
+                "labelLeft": "No tingling",
+                "labelRight": "Extreme tingling"
+            }
+        ]
+    },
+    {
+        "numberQuestion": "7a",
+        "question": "Have you experienced a lack of sensation (numbness) in the last 7 days?",
+        "questionHighlight": "a lack of sensation (numbness)",
+        "isYesnoQuestion": true,
+        "showSubQuestionOnYes": true,
+        "subQuestions": [
+            {
+                "numberQuestion": "7b",
+                "question": "Please select the number that best describes this lack of sensation (numbness) at its worst in the last 7 days.",
+                "questionHighlight": "this lack of sensation (numbness) at its worst",
+                "labelLeft": "No numbness",
+                "labelRight": "Extreme numbness"
+            },
+            {
+                "numberQuestion": "7c",
+                "question": "Have you experienced pain within a numb area in your body in the last 7 days?",
+                "questionHighlight": "pain within a numb area",
+                "isYesnoQuestion": true,
+                "showSubQuestionOnYes": true,
+                "subQuestions": [
+                    {
+                        "numberQuestion": "7d",
+                        "question": "Please select the number that best describes this pain at its worst in the last 7 days.",
+                        "questionHighlight": "this pain at its worst",
+                        "labelLeft": "No pain",
+                        "labelRight": "Extreme pain"
+                    }
+                ]
+            }
+        ]
+    }
+]

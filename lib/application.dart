@@ -1,27 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:questionnaire_project/widget/body_grid_canvas_widget.dart';
+import 'package:questionnaire_project/widget/comment_box_widget.dart';
 import 'package:questionnaire_project/widget/question_widget.dart';
+import 'package:questionnaire_project/model/question_model.dart';
 
 class Application extends StatefulWidget {
-  const Application({super.key});
+  const Application({super.key, required this.questions});
+  final List<Question> questions;
 
   @override
   State<Application> createState() => _ApplicationState();
 }
 
 class _ApplicationState extends State<Application> {
-  Map<String, dynamic> _answers = {};
+  late List<Question> questionList;
+  Map<String, dynamic> answers = {};
+
+  @override
+  void initState() {
+    super.initState();
+    questionList = widget.questions;
+  }
 
   void _saveAnswer(String questionId, dynamic value) {
     setState(() {
-      _answers[questionId] = value;
+      answers[questionId] = value;
     });
 
-    print(_answers);
+    print(answers);
+  }
+
+  void _saveComment(String comment) {
+    setState(() {
+      answers['comment'] = comment;
+    });
+
+    print(answers);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: const Text('PAINPREDICT')),
       body: Center(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -64,149 +84,189 @@ class _ApplicationState extends State<Application> {
                     ),
                   ),
                   const SizedBox(height: 18),
-                  QuestionWidget(
-                    question: Question(
-                      labelLeft: "No Pain",
-                      labelRight: "Extreme Pain",
-                      numberQuestion: "1",
-                      question:
-                          "Please select the number that best describes your pain on average in the last 7 days.",
-                      questionHighlight: "your pain on average",
-                    ),
-                    onAnswer: _saveAnswer,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      BodyGridCanvasWidget(
+                        imagePath: 'assets/images/body_front.png',
+                      ),
+                      BodyGridCanvasWidget(
+                        imagePath: 'assets/images/body_back.png',
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 18),
-                  QuestionWidget(
-                    question: Question(
-                      labelLeft: "No Pain",
-                      labelRight: "Extreme Pain",
-                      numberQuestion: "2",
-                      question:
-                          "Please select the number that best describes your pain on average in the last 7 days.",
-                      questionHighlight: "your pain on average",
-                    ),
-                    onAnswer: _saveAnswer,
-                  ),
+                  ...questionList.map((question) {
+                    return QuestionWidget(
+                      question: question,
+                      onAnswer: _saveAnswer,
+                    );
+                  }),
+                  // QuestionWidget(
+                  //   question: Question(
+                  //     labelLeft: "No Pain",
+                  //     labelRight: "Extreme Pain",
+                  //     numberQuestion: "1",
+                  //     question:
+                  //         "Please select the number that best describes your pain on average in the last 7 days.",
+                  //     questionHighlight: "your pain on average",
+                  //   ),
+                  //   onAnswer: _saveAnswer,
+                  // ),
+                  // const SizedBox(height: 18),
+                  // QuestionWidget(
+                  //   question: Question(
+                  //     labelLeft: "No Pain",
+                  //     labelRight: "Extreme Pain",
+                  //     numberQuestion: "2",
+                  //     question:
+                  //         "Please select the number that best describes your pain on average in the last 7 days.",
+                  //     questionHighlight: "your pain on average",
+                  //   ),
+                  //   onAnswer: _saveAnswer,
+                  // ),
 
-                  const SizedBox(height: 18),
-                  QuestionWidget(
-                    question: Question(
-                      numberQuestion: "3",
-                      question:
-                          "Please choose the picture(s) that best describe(s) your experience of pain in the last 7 days.",
-                      questionHighlight: "your experience of pain",
-                      useChoice: true,
-                    ),
-                    onAnswer: _saveAnswer,
-                  ),
-                  const SizedBox(height: 18),
-                  QuestionWidget(
-                    question: Question(
-                      numberQuestion: "5a",
-                      question:
-                          "Please select the number that best describes your pain on average in the last 7 days.",
-                      questionHighlight: "your pain on average",
-                      isYesnoQuestion: true,
-                      showSubQuestionOnYes: true,
-                      subQuestions: [
-                        Question(
-                          labelLeft: "No burning sensation",
-                          labelRight: "Extreme burning sensation",
-                          numberQuestion: "5b",
-                          question:
-                              "Please select the number that best describes this burning sensation at its worst inthe last 7 days.",
-                          questionHighlight:
-                              "this burning sensation at its worst",
-                        ),
-                      ],
-                    ),
-                    onAnswer: _saveAnswer,
-                  ),
-                  const SizedBox(height: 18),
-                  QuestionWidget(
-                    question: Question(
-                      numberQuestion: "6a",
-                      question:
-                          "Have you experienced tingling in the last 7 days?",
-                      questionHighlight: "tingling",
-                      isYesnoQuestion: true,
-                      showSubQuestionOnYes: true,
-                      subQuestions: [
-                        Question(
-                          labelLeft: "No tingling",
-                          labelRight: "Extreme tingling",
-                          numberQuestion: "6b",
-                          question:
-                              "Please select the number that best describes this tingling at its worst in the last 7 days.",
-                          questionHighlight: "this tingling at its worst",
-                        ),
-                      ],
-                    ),
-                    onAnswer: _saveAnswer,
-                  ),
-                  const SizedBox(height: 18),
-                  QuestionWidget(
-                    question: Question(
-                      numberQuestion: "7a",
-                      question:
-                          "Have you experienced a lack of sensation (numbness) in the last 7 days?",
-                      questionHighlight: "a lack of sensation (numbness)",
-                      isYesnoQuestion: true,
-                      showSubQuestionOnYes: true,
-                      subQuestions: [
-                        Question(
-                          labelLeft: "No numbness",
-                          labelRight: "Extreme numbness",
-                          numberQuestion: "7b",
-                          question:
-                              "Please select the number that best describes this lack of sensation (numbness) at its worst in the last 7 days.",
-                          questionHighlight:
-                              "this lack of sensation (numbness) at its worst",
-                        ),
-                        Question(
-                          numberQuestion: "7c",
-                          question:
-                              "Have you experienced pain within a numb area in your body in the last 7 days?",
-                          questionHighlight: "pain within a numb area",
-                          isYesnoQuestion: true,
-                          showSubQuestionOnYes: true,
-                          subQuestions: [
-                            Question(
-                              labelLeft: "No pain",
-                              labelRight: "Extreme pain",
-                              numberQuestion: "7d",
-                              question:
-                                  "Please select the number that best describes this pain at its worst in the last 7 days.",
-                              questionHighlight: "this pain at its worst",
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    onAnswer: _saveAnswer,
-                  ),
-                  const SizedBox(height: 18),
-                  QuestionWidget(
-                    question: Question(
-                      numberQuestion: "8a",
-                      question:
-                          "Have you experienced a painful electric-shock sensation in the last 7 days?",
-                      questionHighlight: "a painful electric-shock sensation",
-                      isYesnoQuestion: true,
-                      showSubQuestionOnYes: true,
-                      subQuestions: [
-                        Question(
-                          labelLeft: "No electric-shock sensation",
-                          labelRight: "Extreme electric-shock sensation",
-                          numberQuestion: "8b",
-                          question:
-                              "Please select the number that best describes this electric-shock sensation at its worst in the last 7 days.",
-                          questionHighlight:
-                              "this electric-shock sensation at its worst",
-                        ),
-                      ],
-                    ),
-                  ),
+                  // const SizedBox(height: 18),
+                  // QuestionWidget(
+                  //   question: Question(
+                  //     numberQuestion: "3",
+                  //     question:
+                  //         "Please choose the picture(s) that best describe(s) your experience of pain in the last 7 days.",
+                  //     questionHighlight: "your experience of pain",
+                  //     useChoice: true,
+                  //   ),
+                  //   onAnswer: _saveAnswer,
+                  // ),
+                  // const SizedBox(height: 18),
+                  // QuestionWidget(
+                  //   question: Question(
+                  //     numberQuestion: "5a",
+                  //     question:
+                  //         "Please select the number that best describes your pain on average in the last 7 days.",
+                  //     questionHighlight: "your pain on average",
+                  //     isYesnoQuestion: true,
+                  //     showSubQuestionOnYes: true,
+                  //     subQuestions: [
+                  //       Question(
+                  //         labelLeft: "No burning sensation",
+                  //         labelRight: "Extreme burning sensation",
+                  //         numberQuestion: "5b",
+                  //         question:
+                  //             "Please select the number that best describes this burning sensation at its worst inthe last 7 days.",
+                  //         questionHighlight:
+                  //             "this burning sensation at its worst",
+                  //       ),
+                  //     ],
+                  //   ),
+                  //   onAnswer: _saveAnswer,
+                  // ),
+                  // const SizedBox(height: 18),
+                  // QuestionWidget(
+                  //   question: Question(
+                  //     numberQuestion: "6a",
+                  //     question:
+                  //         "Have you experienced tingling in the last 7 days?",
+                  //     questionHighlight: "tingling",
+                  //     isYesnoQuestion: true,
+                  //     showSubQuestionOnYes: true,
+                  //     subQuestions: [
+                  //       Question(
+                  //         labelLeft: "No tingling",
+                  //         labelRight: "Extreme tingling",
+                  //         numberQuestion: "6b",
+                  //         question:
+                  //             "Please select the number that best describes this tingling at its worst in the last 7 days.",
+                  //         questionHighlight: "this tingling at its worst",
+                  //       ),
+                  //     ],
+                  //   ),
+                  //   onAnswer: _saveAnswer,
+                  // ),
+                  // const SizedBox(height: 18),
+                  // QuestionWidget(
+                  //   question: Question(
+                  //     numberQuestion: "7a",
+                  //     question:
+                  //         "Have you experienced a lack of sensation (numbness) in the last 7 days?",
+                  //     questionHighlight: "a lack of sensation (numbness)",
+                  //     isYesnoQuestion: true,
+                  //     showSubQuestionOnYes: true,
+                  //     subQuestions: [
+                  //       Question(
+                  //         labelLeft: "No numbness",
+                  //         labelRight: "Extreme numbness",
+                  //         numberQuestion: "7b",
+                  //         question:
+                  //             "Please select the number that best describes this lack of sensation (numbness) at its worst in the last 7 days.",
+                  //         questionHighlight:
+                  //             "this lack of sensation (numbness) at its worst",
+                  //       ),
+                  //       Question(
+                  //         numberQuestion: "7c",
+                  //         question:
+                  //             "Have you experienced pain within a numb area in your body in the last 7 days?",
+                  //         questionHighlight: "pain within a numb area",
+                  //         isYesnoQuestion: true,
+                  //         showSubQuestionOnYes: true,
+                  //         subQuestions: [
+                  //           Question(
+                  //             labelLeft: "No pain",
+                  //             labelRight: "Extreme pain",
+                  //             numberQuestion: "7d",
+                  //             question:
+                  //                 "Please select the number that best describes this pain at its worst in the last 7 days.",
+                  //             questionHighlight: "this pain at its worst",
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     ],
+                  //   ),
+                  //   onAnswer: _saveAnswer,
+                  // ),
+                  // const SizedBox(height: 18),
+                  // QuestionWidget(
+                  //   question: Question(
+                  //     numberQuestion: "8a",
+                  //     question:
+                  //         "Have you experienced a painful electric-shock sensation in the last 7 days?",
+                  //     questionHighlight: "a painful electric-shock sensation",
+                  //     isYesnoQuestion: true,
+                  //     showSubQuestionOnYes: true,
+                  //     subQuestions: [
+                  //       Question(
+                  //         labelLeft: "No electric-shock sensation",
+                  //         labelRight: "Extreme electric-shock sensation",
+                  //         numberQuestion: "8b",
+                  //         question:
+                  //             "Please select the number that best describes this electric-shock sensation at its worst in the last 7 days.",
+                  //         questionHighlight:
+                  //             "this electric-shock sensation at its worst",
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
+                  // QuestionWidget(
+                  //   question: Question(
+                  //     numberQuestion: "9a",
+                  //     question:
+                  //         "Have you experienced itching in the last 7 days?",
+                  //     questionHighlight: "itching",
+                  //     isYesnoQuestion: true,
+                  //     showSubQuestionOnYes: true,
+                  //     subQuestions: [
+                  //       Question(
+                  //         numberQuestion: "9b",
+                  //         question:
+                  //             "Please select the number that best describes this itching at its worst in the last 7 days",
+                  //         questionHighlight: "this itching at its worst",
+                  //         labelLeft: "No itching",
+                  //         labelRight: "Extreme itching",
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
+                  const SizedBox(height: 30),
+                  CommentBoxWidget(onComment: _saveComment),
                 ],
               ),
             );
