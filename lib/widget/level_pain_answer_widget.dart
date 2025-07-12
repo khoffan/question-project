@@ -24,6 +24,7 @@ class LavelPainWidget extends StatefulWidget {
 class _LavelPainWidgetState extends State<LavelPainWidget> {
   // สถานะปัจจุบันของค่าความเจ็บปวดที่ถูกเลือก
   int? _selectedPainValue;
+  late List<int> painValues;
   // int _selectedYesNoValue = 0;
 
   @override
@@ -31,6 +32,7 @@ class _LavelPainWidgetState extends State<LavelPainWidget> {
     super.initState();
     // กำหนดค่าเริ่มต้นเมื่อวิดเจ็ตถูกสร้างขึ้น
     _selectedPainValue = widget.initialPainValue;
+    painValues = List<int>.generate(10, (index) => index + 1);
   }
 
   // ฟังก์ชันสำหรับจัดการเมื่อมีการเลือกค่าความเจ็บปวด
@@ -45,9 +47,6 @@ class _LavelPainWidgetState extends State<LavelPainWidget> {
 
   @override
   Widget build(BuildContext context) {
-    // สร้างรายการของตัวเลข 0 ถึง 10
-    final List<int> painValues = List<int>.generate(11, (index) => index);
-
     return LayoutBuilder(
       builder: (context, constraints) {
         // กำหนดขนาดของช่องว่างและข้อความตามความกว้างของหน้าจอ
@@ -89,8 +88,8 @@ class _LavelPainWidgetState extends State<LavelPainWidget> {
   double calculateSidePadding(double maxWidth) {
     const double baseWidth = 1188;
     const double stepWidth = 200; // ทุก ๆ 200px ลดลงทีละ 10
-    const double startPadding = 75;
-    const double minPadding = 15;
+    const double startPadding = 85;
+    const double minPadding = 20;
 
     // คำนวณจำนวนช่วงที่ลดลง
     final double diff = baseWidth - maxWidth;

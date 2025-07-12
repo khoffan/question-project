@@ -137,13 +137,13 @@ class _QuestionWidgetState extends State<QuestionWidget> {
     );
   }
 
-  List<TextSpan> _buildHightlightText(Question question, String hightlight) {
-    final start = question.question.indexOf(hightlight);
-    if (start == -1) {
-      return [TextSpan(text: question.question)];
-    }
-    final end = start + hightlight.length;
-    return [
+  List<TextSpan> _buildHightlightText(
+    Question question,
+    List<HightLightText> hightlight,
+  ) {
+    List<TextSpan> spans = [];
+
+    spans.add(
       TextSpan(
         text: "${question.numberQuestion}. ",
         style: TextStyle(
@@ -152,12 +152,86 @@ class _QuestionWidgetState extends State<QuestionWidget> {
           decoration: TextDecoration.underline,
         ),
       ),
-      TextSpan(text: question.question.substring(0, start)),
-      TextSpan(
-        text: question.question.substring(start, end),
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-      ),
-      TextSpan(text: question.question.substring(start + hightlight.length)),
-    ];
+    );
+
+    if (hightlight.isEmpty) {
+      spans.add(TextSpan(text: question.question));
+      return spans;
+    }
+
+    final pattren = RegExp(
+      hightlight.map((e) => RegExp.escape(e.text)).join("|"),
+      caseSensitive: false,
+    );
+
+    int current = 0;
+    final matchs = pattren.allMatches(question.question);
+
+    for (final match in matchs) {
+      if (match.start > current) {
+        spans.add(
+          TextSpan(text: question.question.substring(current, match.start)),
+        );
+      }
+
+      final matchedText = question.question.substring(match.start, match.end);
+
+      final hightlightText = hightlight.firstWhere(
+        (e) => e.text.toLowerCase() == matchedText.toLowerCase(),
+        orElse: () => HightLightText(text: matchedText),
+      );
+
+      if (hightlightText.underline.isEmpty) {
+        spans.add(
+          TextSpan(
+            text: matchedText,
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+          ),
+        );
+      } else {
+        final innerSpans = <TextSpan>[];
+
+        final underlinePattren = RegExp(
+          hightlightText.underline.map(RegExp.escape).join("|"),
+          caseSensitive: false,
+        );
+
+        int currentInner = 0;
+        final innerMatches = underlinePattren.allMatches(matchedText);
+
+        for (final inner in innerMatches) {
+          if (inner.start > currentInner) {
+            innerSpans.add(
+              TextSpan(text: matchedText.substring(currentInner, inner.start)),
+            );
+          }
+
+          innerSpans.add(
+            TextSpan(
+              text: matchedText.substring(inner.start, inner.end),
+              style: TextStyle(decoration: TextDecoration.underline),
+            ),
+          );
+          currentInner = inner.end;
+        }
+        if (currentInner < matchedText.length) {
+          innerSpans.add(TextSpan(text: matchedText.substring(currentInner)));
+        }
+        spans.add(
+          TextSpan(
+            children: innerSpans,
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+          ),
+        );
+      }
+
+      current = match.end;
+    }
+
+    if (current < question.question.length) {
+      spans.add(TextSpan(text: question.question.substring(current)));
+    }
+
+    return spans;
   }
 }

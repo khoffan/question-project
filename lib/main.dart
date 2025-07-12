@@ -2,7 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:questionnaire_project/application.dart';
+import 'package:questionnaire_project/cubit/answer_cubit.dart';
 import 'package:questionnaire_project/model/question_model.dart';
 
 void main() async {
@@ -14,7 +16,7 @@ void main() async {
 
 Future<List<Question>> loadQuestions() async {
   final jsonString = await rootBundle.loadString(
-    'assets/question/question.json',
+    'assets/question/questions.json',
   );
   final jsonMap = json.decode(jsonString);
   if (jsonMap is List) {
@@ -34,7 +36,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'PAINPREDICT',
       debugShowCheckedModeBanner: false,
-      home: Application(questions: questions),
+      home: BlocProvider(
+        create: (context) => AnswerCubit(),
+        child: Application(questions: questions),
+      ),
     );
   }
 }

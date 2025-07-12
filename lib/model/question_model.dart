@@ -1,7 +1,7 @@
 class Question {
   final String numberQuestion;
   final String question;
-  final String questionHighlight;
+  final List<HightLightText> questionHighlight;
   final String labelLeft;
   final String labelRight;
   final bool isYesnoQuestion;
@@ -25,7 +25,20 @@ class Question {
     return Question(
       numberQuestion: json['numberQuestion'] ?? "",
       question: json['question'] ?? "",
-      questionHighlight: json['questionHighlight'] ?? "",
+      questionHighlight:
+          json['questionHighlight'] != null
+              ? List<HightLightText>.from(
+                json['questionHighlight'].map(
+                  (x) => HightLightText(
+                    text: x['text'] ?? "",
+                    underline:
+                        x['underline'] != null
+                            ? List<String>.from(x['underline'])
+                            : const [],
+                  ),
+                ),
+              )
+              : [],
       labelLeft: json['labelLeft'] ?? "",
       labelRight: json['labelRight'] ?? "",
       isYesnoQuestion: json['isYesnoQuestion'] ?? false,
@@ -43,5 +56,27 @@ class Question {
   @override
   String toString() {
     return 'Question(numberQuestion: $numberQuestion, question: $question, questionHighlight: $questionHighlight, labelLeft: $labelLeft, labelRight: $labelRight, isYesnoQuestion: $isYesnoQuestion, useChoice: $useChoice, showSubQuestionOnYes: $showSubQuestionOnYes, subQuestions: $subQuestions)';
+  }
+}
+
+class HightLightText {
+  final String text;
+  final List<String> underline;
+
+  HightLightText({required this.text, this.underline = const []});
+
+  factory HightLightText.fromJson(Map<String, dynamic> json) {
+    return HightLightText(
+      text: json['text'] ?? "",
+      underline:
+          json['underline'] != null
+              ? List<String>.from(json['underline'])
+              : const [],
+    );
+  }
+
+  @override
+  String toString() {
+    return 'HightLightText(text: $text, underline: $underline)';
   }
 }
