@@ -1,10 +1,17 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
+import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:universal_html/html.dart' as html;
+
 import 'package:questionnaire_project/cubit/answer_cubit.dart';
+import 'package:questionnaire_project/model/answer_model.dart';
+import 'package:questionnaire_project/model/question_model.dart';
 import 'package:questionnaire_project/widget/body_grid_canvas_widget.dart';
 import 'package:questionnaire_project/widget/comment_box_widget.dart';
 import 'package:questionnaire_project/widget/question_widget.dart';
-import 'package:questionnaire_project/model/question_model.dart';
 
 class Application extends StatefulWidget {
   const Application({super.key, required this.questions});
@@ -26,16 +33,112 @@ class _ApplicationState extends State<Application> {
     questionList = widget.questions;
   }
 
-  void _saveAnswer(String questionId, dynamic value) {
-    context.read<AnswerCubit>().saveAnswer(questionId, value.toString());
-
-    print(context.read<AnswerCubit>().state.answers);
+  void _saveAnswer(String questionId, dynamic value, String? parentId) {
+    context.read<AnswerCubit>().saveAnswer(
+      questionId: questionId,
+      value: value.toString(),
+      parentId: parentId,
+    );
   }
 
   void _saveComment(String comment) {
-    context.read<AnswerCubit>().saveAnswer('comment', comment.toString());
+    context.read<AnswerCubit>().saveAnswer(
+      questionId: 'comment',
+      value: comment.toString(),
+    );
+  }
 
-    print(context.read<AnswerCubit>().state.answers);
+  String exportAnswer2Json(List<AnswerModel> ans) {
+    final result = {
+      "form_id": "123456",
+      "patian_id": "user123",
+      "user_id": "user123",
+      "patian_name": "John Doe",
+      "answers": ans.map((e) => e.toJson()).toList(),
+    };
+    return JsonEncoder.withIndent("  ").convert(result);
+  }
+
+  Map<String, String> flattrenAnswerList(List<AnswerModel> list) {
+    final Map<String, String> map = {};
+
+    void walk(List<AnswerModel> answers) {
+      for (final ans in answers) {
+        map[ans.numberQuestion] = ans.answer;
+        if (ans.subAnswers.isNotEmpty) {
+          walk(ans.subAnswers);
+        }
+      }
+    }
+
+    walk(list);
+    return map;
+  }
+
+  int compareNumberQuestion(String a, String b) {
+    final regexp = RegExp(r'^(\d+)([a-zA-Z]*)$');
+    final matchA = regexp.firstMatch(a);
+    final matchB = regexp.firstMatch(b);
+
+    if (matchA == null || matchB == null) return a.compareTo(b);
+
+    final int numberA = int.parse(matchA.group(1)!);
+    final int numberB = int.parse(matchB.group(1)!);
+
+    if (numberA != numberB) return numberA.compareTo(numberB);
+
+    final String letterA = matchA.group(2) ?? '';
+    final String letterB = matchB.group(2) ?? '';
+
+    return letterA.compareTo(letterB);
+  }
+
+  List<AnswerModel> sortedAnswerList(List<AnswerModel> list) {
+    final sorted = List<AnswerModel>.from(list);
+
+    sorted.sort(
+      (a, b) => compareNumberQuestion(a.numberQuestion, b.numberQuestion),
+    );
+
+    for (final ans in list) {
+      if (ans.subAnswers.isNotEmpty) {
+        ans.subAnswers.sort(
+          (a, b) => compareNumberQuestion(a.numberQuestion, b.numberQuestion),
+        );
+      }
+    }
+
+    return sorted;
+  }
+
+  void downloadJsonFIle(
+    String jsonString, [
+    String filename = "answer.json",
+  ]) async {
+    final bytes = utf8.encode(jsonString);
+    final blob = html.Blob([Uint8List.fromList(bytes)]);
+    final url = html.Url.createObjectUrlFromBlob(blob);
+
+    final archor = html.AnchorElement(href: url)
+      ..setAttribute("download", filename);
+    archor.click();
+    html.Url.revokeObjectUrl(url);
+  }
+
+  void exportJson2Csv({required List<AnswerModel> answers}) async {
+    final now = DateTime.now();
+    final dateStr =
+        "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+
+    final ansMap = flattrenAnswerList(answers);
+
+    final header = ['patianId', 'patianName', ...ansMap.keys, "date"];
+
+    final row = ["user123", "John Doe", ...ansMap.values, dateStr];
+
+    final csvString = const ListToCsvConverter().convert([header, row]);
+
+    downloadJsonFIle(csvString, "answer.csv");
   }
 
   @override
@@ -107,171 +210,33 @@ class _ApplicationState extends State<Application> {
                         onAnswer: _saveAnswer,
                       );
                     }),
-                    // QuestionWidget(
-                    //   question: Question(
-                    //     labelLeft: "No Pain",
-                    //     labelRight: "Extreme Pain",
-                    //     numberQuestion: "1",
-                    //     question:
-                    //         "Please select the number that best describes your pain on average in the last 7 days.",
-                    //     questionHighlight: "your pain on average",
-                    //   ),
-                    //   onAnswer: _saveAnswer,
-                    // ),
-                    // const SizedBox(height: 18),
-                    // QuestionWidget(
-                    //   question: Question(
-                    //     labelLeft: "No Pain",
-                    //     labelRight: "Extreme Pain",
-                    //     numberQuestion: "2",
-                    //     question:
-                    //         "Please select the number that best describes your pain on average in the last 7 days.",
-                    //     questionHighlight: "your pain on average",
-                    //   ),
-                    //   onAnswer: _saveAnswer,
-                    // ),
-
-                    // const SizedBox(height: 18),
-                    // QuestionWidget(
-                    //   question: Question(
-                    //     numberQuestion: "3",
-                    //     question:
-                    //         "Please choose the picture(s) that best describe(s) your experience of pain in the last 7 days.",
-                    //     questionHighlight: "your experience of pain",
-                    //     useChoice: true,
-                    //   ),
-                    //   onAnswer: _saveAnswer,
-                    // ),
-                    // const SizedBox(height: 18),
-                    // QuestionWidget(
-                    //   question: Question(
-                    //     numberQuestion: "5a",
-                    //     question:
-                    //         "Please select the number that best describes your pain on average in the last 7 days.",
-                    //     questionHighlight: "your pain on average",
-                    //     isYesnoQuestion: true,
-                    //     showSubQuestionOnYes: true,
-                    //     subQuestions: [
-                    //       Question(
-                    //         labelLeft: "No burning sensation",
-                    //         labelRight: "Extreme burning sensation",
-                    //         numberQuestion: "5b",
-                    //         question:
-                    //             "Please select the number that best describes this burning sensation at its worst inthe last 7 days.",
-                    //         questionHighlight:
-                    //             "this burning sensation at its worst",
-                    //       ),
-                    //     ],
-                    //   ),
-                    //   onAnswer: _saveAnswer,
-                    // ),
-                    // const SizedBox(height: 18),
-                    // QuestionWidget(
-                    //   question: Question(
-                    //     numberQuestion: "6a",
-                    //     question:
-                    //         "Have you experienced tingling in the last 7 days?",
-                    //     questionHighlight: "tingling",
-                    //     isYesnoQuestion: true,
-                    //     showSubQuestionOnYes: true,
-                    //     subQuestions: [
-                    //       Question(
-                    //         labelLeft: "No tingling",
-                    //         labelRight: "Extreme tingling",
-                    //         numberQuestion: "6b",
-                    //         question:
-                    //             "Please select the number that best describes this tingling at its worst in the last 7 days.",
-                    //         questionHighlight: "this tingling at its worst",
-                    //       ),
-                    //     ],
-                    //   ),
-                    //   onAnswer: _saveAnswer,
-                    // ),
-                    // const SizedBox(height: 18),
-                    // QuestionWidget(
-                    //   question: Question(
-                    //     numberQuestion: "7a",
-                    //     question:
-                    //         "Have you experienced a lack of sensation (numbness) in the last 7 days?",
-                    //     questionHighlight: "a lack of sensation (numbness)",
-                    //     isYesnoQuestion: true,
-                    //     showSubQuestionOnYes: true,
-                    //     subQuestions: [
-                    //       Question(
-                    //         labelLeft: "No numbness",
-                    //         labelRight: "Extreme numbness",
-                    //         numberQuestion: "7b",
-                    //         question:
-                    //             "Please select the number that best describes this lack of sensation (numbness) at its worst in the last 7 days.",
-                    //         questionHighlight:
-                    //             "this lack of sensation (numbness) at its worst",
-                    //       ),
-                    //       Question(
-                    //         numberQuestion: "7c",
-                    //         question:
-                    //             "Have you experienced pain within a numb area in your body in the last 7 days?",
-                    //         questionHighlight: "pain within a numb area",
-                    //         isYesnoQuestion: true,
-                    //         showSubQuestionOnYes: true,
-                    //         subQuestions: [
-                    //           Question(
-                    //             labelLeft: "No pain",
-                    //             labelRight: "Extreme pain",
-                    //             numberQuestion: "7d",
-                    //             question:
-                    //                 "Please select the number that best describes this pain at its worst in the last 7 days.",
-                    //             questionHighlight: "this pain at its worst",
-                    //           ),
-                    //         ],
-                    //       ),
-                    //     ],
-                    //   ),
-                    //   onAnswer: _saveAnswer,
-                    // ),
-                    // const SizedBox(height: 18),
-                    // QuestionWidget(
-                    //   question: Question(
-                    //     numberQuestion: "8a",
-                    //     question:
-                    //         "Have you experienced a painful electric-shock sensation in the last 7 days?",
-                    //     questionHighlight: "a painful electric-shock sensation",
-                    //     isYesnoQuestion: true,
-                    //     showSubQuestionOnYes: true,
-                    //     subQuestions: [
-                    //       Question(
-                    //         labelLeft: "No electric-shock sensation",
-                    //         labelRight: "Extreme electric-shock sensation",
-                    //         numberQuestion: "8b",
-                    //         question:
-                    //             "Please select the number that best describes this electric-shock sensation at its worst in the last 7 days.",
-                    //         questionHighlight:
-                    //             "this electric-shock sensation at its worst",
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-                    // QuestionWidget(
-                    //   question: Question(
-                    //     numberQuestion: "9a",
-                    //     question:
-                    //         "Have you experienced itching in the last 7 days?",
-                    //     questionHighlight: "itching",
-                    //     isYesnoQuestion: true,
-                    //     showSubQuestionOnYes: true,
-                    //     subQuestions: [
-                    //       Question(
-                    //         numberQuestion: "9b",
-                    //         question:
-                    //             "Please select the number that best describes this itching at its worst in the last 7 days",
-                    //         questionHighlight: "this itching at its worst",
-                    //         labelLeft: "No itching",
-                    //         labelRight: "Extreme itching",
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
                     const SizedBox(height: 30),
                     CommentBoxWidget(onComment: _saveComment),
+                    Row(
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            final answers = context.read<AnswerCubit>().state;
+
+                            final sortedAnswers = sortedAnswerList(answers);
+
+                            final json = exportAnswer2Json(sortedAnswers);
+                            downloadJsonFIle(json);
+                          },
+                          child: Text('Export json file'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            final answers = context.read<AnswerCubit>().state;
+
+                            final sortedAnswers = sortedAnswerList(answers);
+
+                            exportJson2Csv(answers: sortedAnswers);
+                          },
+                          child: Text('Export csv file'),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               );

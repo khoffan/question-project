@@ -1,5 +1,5 @@
 [
-   {
+    {
         "question_id": "12345",
         "title": "Pain Questionnaire",
         "questions": [
@@ -88,8 +88,8 @@
                 ]
             }
         ]
-   },
-   {
+    },
+    {
         "question_id": "1234567",
         "title": "Extended Pain Questionnaire",
         "questions": [
@@ -178,5 +178,5 @@
                 ]
             }
         ]
-   }
+    }
 ]

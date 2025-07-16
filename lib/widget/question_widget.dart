@@ -7,7 +7,7 @@ import 'package:questionnaire_project/widget/yes_no_question_widget.dart';
 class QuestionWidget extends StatefulWidget {
   const QuestionWidget({super.key, required this.question, this.onAnswer});
   final Question question;
-  final Function(String questionId, dynamic value)? onAnswer;
+  final Function(String questionId, dynamic value, String? parentId)? onAnswer;
 
   @override
   State<QuestionWidget> createState() => _QuestionWidgetState();
@@ -23,25 +23,29 @@ class _QuestionWidgetState extends State<QuestionWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (widget.question.isYesnoQuestion) ...[
-          _buildYesNoQuestion(widget.question, selectedYesNoValue),
+          _buildYesNoQuestion(widget.question, selectedYesNoValue, null),
           const SizedBox(height: 40),
           if (selectedYesNoValue[widget.question.numberQuestion] == 2 &&
               widget.question.showSubQuestionOnYes) ...[
             if (widget.question.subQuestions.isNotEmpty) ...[
               for (var question in widget.question.subQuestions) ...[
                 if (question.isYesnoQuestion) ...[
-                  _buildYesNoQuestion(question, selectedYesNoValue),
+                  _buildYesNoQuestion(
+                    question,
+                    selectedYesNoValue,
+                    widget.question.numberQuestion,
+                  ),
                   const SizedBox(height: 40),
                   if (question.showSubQuestionOnYes &&
                       selectedYesNoValue[question.numberQuestion] == 2 &&
                       question.subQuestions.isNotEmpty) ...[
                     for (var subQuestion in question.subQuestions) ...[
-                      _buildLavelChoice(subQuestion),
+                      _buildLavelChoice(subQuestion, question.numberQuestion),
                       const SizedBox(height: 40),
                     ],
                   ],
                 ] else ...[
-                  _buildLavelChoice(question),
+                  _buildLavelChoice(question, widget.question.numberQuestion),
                   const SizedBox(height: 40),
                 ],
               ],
@@ -65,11 +69,16 @@ class _QuestionWidgetState extends State<QuestionWidget> {
                 _selectedPainValue = value;
               });
               final painValue = _selectedPainValue;
-              widget.onAnswer?.call(widget.question.numberQuestion, painValue);
+              widget.onAnswer?.call(
+                widget.question.numberQuestion,
+                painValue,
+                null,
+              );
             },
           ),
+          const SizedBox(height: 40),
         ] else ...[
-          _buildLavelChoice(widget.question),
+          _buildLavelChoice(widget.question, null),
         ],
       ],
     );
@@ -78,6 +87,7 @@ class _QuestionWidgetState extends State<QuestionWidget> {
   Widget _buildYesNoQuestion(
     Question question,
     Map<String, int> initialYesNoValue,
+    String? parentId,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,14 +110,18 @@ class _QuestionWidgetState extends State<QuestionWidget> {
             });
             final yesNoValue =
                 selectedYesNoValue[question.numberQuestion] == 1 ? "no" : "yes";
-            widget.onAnswer?.call(question.numberQuestion, yesNoValue);
+            widget.onAnswer?.call(
+              question.numberQuestion,
+              yesNoValue,
+              parentId,
+            );
           },
         ),
       ],
     );
   }
 
-  Widget _buildLavelChoice(Question question) {
+  Widget _buildLavelChoice(Question question, String? parentId) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -129,7 +143,7 @@ class _QuestionWidgetState extends State<QuestionWidget> {
               _selectedPainValue = value;
             });
             final painValue = _selectedPainValue;
-            widget.onAnswer?.call(question.numberQuestion, painValue);
+            widget.onAnswer?.call(question.numberQuestion, painValue, parentId);
           },
           initialPainValue: _selectedPainValue,
         ),
