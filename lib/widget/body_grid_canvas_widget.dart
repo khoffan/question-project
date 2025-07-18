@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class BodyGridCanvasWidget extends StatefulWidget {
-  const BodyGridCanvasWidget({Key? key, required this.imagePath})
-    : super(key: key);
+  const BodyGridCanvasWidget({super.key, required this.imagePath});
   final String imagePath;
 
   @override
@@ -111,10 +110,9 @@ class BodyGridPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final Paint gridPaint =
-        Paint()
-          ..color = Colors.grey
-          ..style = PaintingStyle.stroke;
+    final Paint gridPaint = Paint()
+      ..color = Colors.grey
+      ..style = PaintingStyle.stroke;
 
     const double cellSize = 100;
 

@@ -28,6 +28,8 @@ class _ChoiceAnswerWidgetState extends State<ChoiceAnswerWidget> {
         return Padding(
           padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildChoice(
                 image: "slight",
@@ -76,23 +78,85 @@ class _ChoiceAnswerWidgetState extends State<ChoiceAnswerWidget> {
     required int number,
     required Function(int) onAnswer,
   }) {
-    return Row(
-      children: [
-        Checkbox(
-          value: _selectedChoiceValue == number,
-          onChanged: (_) => _handleChoiceSelection(number),
-        ),
-        const SizedBox(width: 30),
-        if (image.isNotEmpty && image != "") ...[
-          SizedBox(
-            width: 200,
-            height: 100,
-            child: Image.asset("assets/images/$image.png", fit: BoxFit.cover),
+    final maxWidth = MediaQuery.of(context).size.width;
+    if (maxWidth <= 400) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Checkbox(
+            value: _selectedChoiceValue == number,
+            onChanged: (_) => _handleChoiceSelection(number),
+          ),
+          if (image.isNotEmpty) const SizedBox(height: 5),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (image.isNotEmpty && image != "") ...[
+                SizedBox(
+                  width: 200,
+                  height: 100,
+                  child: Image.asset(
+                    "assets/images/$image.png",
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                const SizedBox(height: 5),
+              ],
+              Text(text),
+            ],
           ),
         ],
-        const SizedBox(width: 16),
-        Text(text),
-      ],
-    );
+      );
+    } else {
+      return Row(
+        children: [
+          Checkbox(
+            value: _selectedChoiceValue == number,
+            onChanged: (_) => _handleChoiceSelection(number),
+          ),
+          const SizedBox(width: 30),
+          maxWidth <= 680
+              ? Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (image.isNotEmpty && image != "") ...[
+                        SizedBox(
+                          width: 200,
+                          height: 100,
+                          child: Image.asset(
+                            "assets/images/$image.png",
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                      Text(text),
+                    ],
+                  ),
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (image.isNotEmpty && image != "") ...[
+                      SizedBox(
+                        width: 200,
+                        height: 100,
+                        child: Image.asset(
+                          "assets/images/$image.png",
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                    ],
+                    Text(text),
+                  ],
+                ),
+        ],
+      );
+    }
   }
 }

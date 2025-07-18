@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:questionnaire_project/model/question_model.dart';
-import 'package:questionnaire_project/widget/choice_answer_widget.dart';
-import 'package:questionnaire_project/widget/level_pain_answer_widget.dart';
-import 'package:questionnaire_project/widget/yes_no_question_widget.dart';
+import 'package:questionnaire/model/question_model.dart';
+import 'package:questionnaire/widget/choice_answer_widget.dart';
+import 'package:questionnaire/widget/level_pain_answer_widget.dart';
+import 'package:questionnaire/widget/yes_no_question_widget.dart';
 
 class QuestionWidget extends StatefulWidget {
   const QuestionWidget({super.key, required this.question, this.onAnswer});

@@ -4,14 +4,13 @@ import 'dart:typed_data';
 import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:questionnaire/cubit/answer_cubit.dart';
+import 'package:questionnaire/model/answer_model.dart';
+import 'package:questionnaire/model/question_model.dart';
+import 'package:questionnaire/widget/body_grid_canvas_widget.dart';
+import 'package:questionnaire/widget/comment_box_widget.dart';
+import 'package:questionnaire/widget/question_widget.dart';
 import 'package:universal_html/html.dart' as html;
-
-import 'package:questionnaire_project/cubit/answer_cubit.dart';
-import 'package:questionnaire_project/model/answer_model.dart';
-import 'package:questionnaire_project/model/question_model.dart';
-import 'package:questionnaire_project/widget/body_grid_canvas_widget.dart';
-import 'package:questionnaire_project/widget/comment_box_widget.dart';
-import 'package:questionnaire_project/widget/question_widget.dart';
 
 class Application extends StatefulWidget {
   const Application({super.key, required this.questions});
@@ -22,6 +21,10 @@ class Application extends StatefulWidget {
 }
 
 class _ApplicationState extends State<Application> {
+  String _userId = '';
+  String _userName = '';
+  String _patientId = '';
+  String _patientName = '';
   late List<Question> questionList;
 
   ScrollController scrollController = ScrollController();
@@ -31,29 +34,40 @@ class _ApplicationState extends State<Application> {
     super.initState();
 
     questionList = widget.questions;
+    final queryParams = Uri.base.queryParameters;
+    final String? userId = queryParams['id'];
+    final String? userName = queryParams['name'];
+    final String? patientId = queryParams['patientId'];
+    final String? patientName = queryParams['patientName'];
+    _userId = userId ?? '';
+    _userName = userName ?? '';
+    _patientId = patientId ?? userId ?? '';
+    _patientName = patientName ?? userName ?? '';
+    print('Uri info: $_userId $_userName $_patientId $_patientName');
   }
 
   void _saveAnswer(String questionId, dynamic value, String? parentId) {
     context.read<AnswerCubit>().saveAnswer(
-      questionId: questionId,
-      value: value.toString(),
-      parentId: parentId,
-    );
+          questionId: questionId,
+          value: value.toString(),
+          parentId: parentId,
+        );
   }
 
   void _saveComment(String comment) {
     context.read<AnswerCubit>().saveAnswer(
-      questionId: 'comment',
-      value: comment.toString(),
-    );
+          questionId: 'comment',
+          value: comment.toString(),
+        );
   }
 
   String exportAnswer2Json(List<AnswerModel> ans) {
     final result = {
       "form_id": "123456",
-      "patian_id": "user123",
-      "user_id": "user123",
-      "patian_name": "John Doe",
+      "user_id": _userId,
+      "user_name": _userName,
+      "patian_id": _patientId,
+      "patian_name": _patientName,
       "answers": ans.map((e) => e.toJson()).toList(),
     };
     return JsonEncoder.withIndent("  ").convert(result);
@@ -150,11 +164,8 @@ class _ApplicationState extends State<Application> {
         child: Center(
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final bool isWidth = constraints.maxWidth > 1440;
-              final double containerWidth =
-                  isWidth ? 1260 : constraints.maxWidth;
               return Container(
-                width: containerWidth,
+                constraints: BoxConstraints(maxWidth: 1260),
                 color: Colors.white,
                 padding: const EdgeInsets.all(36),
                 child: Column(
@@ -192,16 +203,33 @@ class _ApplicationState extends State<Application> {
                       ),
                     ),
                     const SizedBox(height: 18),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        BodyGridCanvasWidget(
-                          imagePath: 'assets/images/body_front.png',
-                        ),
-                        BodyGridCanvasWidget(
-                          imagePath: 'assets/images/body_back.png',
-                        ),
-                      ],
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        if (constraints.maxWidth <= 680) {
+                          return Column(
+                            children: [
+                              BodyGridCanvasWidget(
+                                imagePath: 'assets/images/body_front.png',
+                              ),
+                              const SizedBox(height: 10),
+                              BodyGridCanvasWidget(
+                                imagePath: 'assets/images/body_back.png',
+                              ),
+                            ],
+                          );
+                        }
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            BodyGridCanvasWidget(
+                              imagePath: 'assets/images/body_front.png',
+                            ),
+                            BodyGridCanvasWidget(
+                              imagePath: 'assets/images/body_back.png',
+                            ),
+                          ],
+                        );
+                      },
                     ),
                     const SizedBox(height: 18),
                     ...questionList.map((question) {
@@ -212,30 +240,64 @@ class _ApplicationState extends State<Application> {
                     }),
                     const SizedBox(height: 30),
                     CommentBoxWidget(onComment: _saveComment),
-                    Row(
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            final answers = context.read<AnswerCubit>().state;
-
-                            final sortedAnswers = sortedAnswerList(answers);
-
-                            final json = exportAnswer2Json(sortedAnswers);
-                            downloadJsonFIle(json);
-                          },
-                          child: Text('Export json file'),
-                        ),
-                        ElevatedButton(
-                          onPressed: () {
-                            final answers = context.read<AnswerCubit>().state;
-
-                            final sortedAnswers = sortedAnswerList(answers);
-
-                            exportJson2Csv(answers: sortedAnswers);
-                          },
-                          child: Text('Export csv file'),
-                        ),
-                      ],
+                    const SizedBox(height: 30),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        if (constraints.maxWidth <= 360) {
+                          return Column(
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  final answers =
+                                      context.read<AnswerCubit>().state;
+                                  final sortedAnswers = sortedAnswerList(
+                                    answers,
+                                  );
+                                  final json = exportAnswer2Json(sortedAnswers);
+                                  downloadJsonFIle(json);
+                                },
+                                child: Text('Export json file'),
+                              ),
+                              const SizedBox(height: 10),
+                              ElevatedButton(
+                                onPressed: () {
+                                  final answers =
+                                      context.read<AnswerCubit>().state;
+                                  final sortedAnswers = sortedAnswerList(
+                                    answers,
+                                  );
+                                  exportJson2Csv(answers: sortedAnswers);
+                                },
+                                child: Text('Export csv file'),
+                              ),
+                            ],
+                          );
+                        }
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                final answers =
+                                    context.read<AnswerCubit>().state;
+                                final sortedAnswers = sortedAnswerList(answers);
+                                final json = exportAnswer2Json(sortedAnswers);
+                                downloadJsonFIle(json);
+                              },
+                              child: Text('Export json file'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                final answers =
+                                    context.read<AnswerCubit>().state;
+                                final sortedAnswers = sortedAnswerList(answers);
+                                exportJson2Csv(answers: sortedAnswers);
+                              },
+                              child: Text('Export csv file'),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ],
                 ),

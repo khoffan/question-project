@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:questionnaire_project/cubit/answer_state.dart';
-import 'package:questionnaire_project/model/answer_model.dart';
+import 'package:questionnaire/model/answer_model.dart';
 
 class AnswerCubit extends Cubit<List<AnswerModel>> {
   AnswerCubit() : super([]);
