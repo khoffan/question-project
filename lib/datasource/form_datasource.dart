@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:questionnaire_project/model/answer_model.dart';
-import 'package:questionnaire_project/model/question_model.dart';
+import 'package:questionnaire/model/answer_model.dart';
+import 'package:questionnaire/model/question_model.dart';
 
 abstract class FormDataSource {
   Future<List<Question>?> getQuestions();

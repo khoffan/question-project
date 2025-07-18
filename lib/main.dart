@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:questionnaire_project/application.dart';
-import 'package:questionnaire_project/cubit/answer_cubit.dart';
-import 'package:questionnaire_project/model/question_model.dart';
+import 'package:questionnaire/application.dart';
+import 'package:questionnaire/cubit/answer_cubit.dart';
+import 'package:questionnaire/model/question_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
