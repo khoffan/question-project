@@ -1,8 +1,10 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:questionnaire/application.dart';
 import 'package:questionnaire/cubit/answer_cubit.dart';
 import 'package:questionnaire/model/question_model.dart';
@@ -11,6 +13,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final questions = await loadQuestions();
+  if (kIsWeb) {
+    usePathUrlStrategy();
+  }
   runApp(MyApp(questions: questions));
 }
 

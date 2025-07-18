@@ -12,7 +12,6 @@ import 'package:questionnaire/widget/comment_box_widget.dart';
 import 'package:questionnaire/widget/question_widget.dart';
 import 'package:universal_html/html.dart' as html;
 
-
 class Application extends StatefulWidget {
   const Application({super.key, required this.questions});
   final List<Question> questions;
@@ -22,6 +21,10 @@ class Application extends StatefulWidget {
 }
 
 class _ApplicationState extends State<Application> {
+  String _userId = '';
+  String _userName = '';
+  String _patientId = '';
+  String _patientName = '';
   late List<Question> questionList;
 
   ScrollController scrollController = ScrollController();
@@ -31,6 +34,16 @@ class _ApplicationState extends State<Application> {
     super.initState();
 
     questionList = widget.questions;
+    final queryParams = Uri.base.queryParameters;
+    final String? userId = queryParams['id'];
+    final String? userName = queryParams['name'];
+    final String? patientId = queryParams['patientId'];
+    final String? patientName = queryParams['patientName'];
+    _userId = userId ?? '';
+    _userName = userName ?? '';
+    _patientId = patientId ?? userId ?? '';
+    _patientName = patientName ?? userName ?? '';
+    print('Uri info: $_userId $_userName $_patientId $_patientName');
   }
 
   void _saveAnswer(String questionId, dynamic value, String? parentId) {
@@ -51,9 +64,10 @@ class _ApplicationState extends State<Application> {
   String exportAnswer2Json(List<AnswerModel> ans) {
     final result = {
       "form_id": "123456",
-      "patian_id": "user123",
-      "user_id": "user123",
-      "patian_name": "John Doe",
+      "user_id": _userId,
+      "user_name": _userName,
+      "patian_id": _patientId,
+      "patian_name": _patientName,
       "answers": ans.map((e) => e.toJson()).toList(),
     };
     return JsonEncoder.withIndent("  ").convert(result);
