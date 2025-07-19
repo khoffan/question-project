@@ -51,9 +51,10 @@ class _LavelPainWidgetState extends State<LavelPainWidget> {
       builder: (context, constraints) {
         // final double availableWidth =
         //     constraints.maxWidth - (horizontalPadding * 2);
-        final double fontSize = constraints.maxWidth < 680
-            ? 14.0
-            : 16.0; // ปรับขนาดฟอนต์ตามความกว้าง
+        final double fontSize =
+            constraints.maxWidth < 680
+                ? 14.0
+                : 16.0; // ปรับขนาดฟอนต์ตามความกว้าง
         final double arrowSize =
             constraints.maxWidth < 680 ? 20.0 : 25.0; // ปรับขนาดลูกศร
 
@@ -83,7 +84,7 @@ class _LavelPainWidgetState extends State<LavelPainWidget> {
   double calculateSidePadding(double maxWidth) {
     const double baseWidth = 1188;
     const double stepWidth = 200; // ทุก ๆ 200px ลดลงทีละ 10
-    const double startPadding = 85;
+    const double startPadding = 60;
     const double minPadding = 20;
 
     // คำนวณจำนวนช่วงที่ลดลง
@@ -117,84 +118,89 @@ class _LavelPainWidgetState extends State<LavelPainWidget> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: painValues.asMap().entries.map((entry) {
-              final int idx = entry.key;
-              final int value = entry.value;
-              return Expanded(
-                child: InkWell(
-                  onTap: () => _handlePainSelection(value),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Stack(
-                        alignment: Alignment.topCenter,
-                        clipBehavior: Clip.none,
+            children:
+                painValues.asMap().entries.map((entry) {
+                  final int idx = entry.key;
+                  final int value = entry.value;
+                  return Expanded(
+                    child: InkWell(
+                      onTap: () => _handlePainSelection(value),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          if (idx == 0 || idx == painValues.length - 1) ...[
-                            Positioned(
-                              top: -arrowSize * 0.8, // ปรับให้ลอยขึ้น
-                              child: Icon(
-                                Icons.arrow_drop_down,
-                                size: arrowSize,
+                          Stack(
+                            alignment: Alignment.topCenter,
+                            clipBehavior: Clip.none,
+                            children: [
+                              if (idx == 0 || idx == painValues.length - 1) ...[
+                                Positioned(
+                                  top: -arrowSize * 0.8, // ปรับให้ลอยขึ้น
+                                  child: Icon(
+                                    Icons.arrow_drop_down,
+                                    size: arrowSize,
+                                  ),
+                                ),
+                                Positioned(
+                                  top: -arrowSize * 1.6,
+                                  child:
+                                      idx == 0
+                                          ? Text(
+                                            labelLeft,
+                                            style: TextStyle(
+                                              fontSize: fontSize,
+                                            ),
+                                          )
+                                          : Text(
+                                            labelRight,
+                                            style: TextStyle(
+                                              fontSize: fontSize,
+                                            ),
+                                          ),
+                                ),
+                              ],
+                              Text(
+                                value.toString(),
+                                style: TextStyle(fontSize: fontSize),
                               ),
+                            ],
+                          ),
+                          Container(
+                            width: 2,
+                            height: 20,
+                            color: Colors.black,
+                            margin: const EdgeInsets.symmetric(vertical: 2),
+                          ),
+                          const SizedBox(height: 0),
+                          Transform.translate(
+                            offset: Offset(0, -10),
+                            child: Checkbox(
+                              value: _selectedPainValue == value,
+                              onChanged: (_) => _handlePainSelection(value),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4.0),
+                              ),
+                              side: WidgetStateBorderSide.resolveWith(
+                                (states) => const BorderSide(
+                                  width: 1.5,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              activeColor:
+                                  Colors.blue[100], // สีพื้นหลังเมื่อถูกเลือก
+                              checkColor:
+                                  Colors.blue[700], // สีของเครื่องหมายถูก
+                              materialTapTargetSize:
+                                  MaterialTapTargetSize
+                                      .shrinkWrap, // ให้ขนาดเล็กลง
+                              visualDensity:
+                                  VisualDensity.compact, // ขนาด compact
                             ),
-                            Positioned(
-                              top: -arrowSize * 1.6,
-                              child: idx == 0
-                                  ? Text(
-                                      labelLeft,
-                                      style: TextStyle(
-                                        fontSize: fontSize,
-                                      ),
-                                    )
-                                  : Text(
-                                      labelRight,
-                                      style: TextStyle(
-                                        fontSize: fontSize,
-                                      ),
-                                    ),
-                            ),
-                          ],
-                          Text(
-                            value.toString(),
-                            style: TextStyle(fontSize: fontSize),
                           ),
                         ],
                       ),
-                      Container(
-                        width: 2,
-                        height: 20,
-                        color: Colors.black,
-                        margin: const EdgeInsets.symmetric(vertical: 2),
-                      ),
-                      const SizedBox(height: 0),
-                      Transform.translate(
-                        offset: Offset(0, -10),
-                        child: Checkbox(
-                          value: _selectedPainValue == value,
-                          onChanged: (_) => _handlePainSelection(value),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(4.0),
-                          ),
-                          side: WidgetStateBorderSide.resolveWith(
-                            (states) => const BorderSide(
-                              width: 1.5,
-                              color: Colors.black,
-                            ),
-                          ),
-                          activeColor:
-                              Colors.blue[100], // สีพื้นหลังเมื่อถูกเลือก
-                          checkColor: Colors.blue[700], // สีของเครื่องหมายถูก
-                          materialTapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap, // ให้ขนาดเล็กลง
-                          visualDensity: VisualDensity.compact, // ขนาด compact
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }).toList(),
+                    ),
+                  );
+                }).toList(),
           ),
         ],
       ),

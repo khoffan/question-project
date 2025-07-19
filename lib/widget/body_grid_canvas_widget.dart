@@ -25,7 +25,7 @@ class _BodyGridCanvasWidgetState extends State<BodyGridCanvasWidget> {
     loadBodyImage(widget.imagePath);
   }
 
-  Future<void> loadBodyImage(String imagePath) async {
+  void loadBodyImage(String imagePath) async {
     final ByteData data = await rootBundle.load(imagePath);
     final Uint8List list = Uint8List.view(data.buffer);
     final ui.Codec codec = await ui.instantiateImageCodec(list);

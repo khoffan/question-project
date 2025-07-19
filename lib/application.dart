@@ -5,6 +5,7 @@ import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:questionnaire/cubit/answer_cubit.dart';
+import 'package:questionnaire/cubit/form_cubit.dart';
 import 'package:questionnaire/model/answer_model.dart';
 import 'package:questionnaire/model/question_model.dart';
 import 'package:questionnaire/widget/body_grid_canvas_widget.dart';
@@ -48,17 +49,17 @@ class _ApplicationState extends State<Application> {
 
   void _saveAnswer(String questionId, dynamic value, String? parentId) {
     context.read<AnswerCubit>().saveAnswer(
-          questionId: questionId,
-          value: value.toString(),
-          parentId: parentId,
-        );
+      questionId: questionId,
+      value: value.toString(),
+      parentId: parentId,
+    );
   }
 
   void _saveComment(String comment) {
     context.read<AnswerCubit>().saveAnswer(
-          questionId: 'comment',
-          value: comment.toString(),
-        );
+      questionId: 'comment',
+      value: comment.toString(),
+    );
   }
 
   String exportAnswer2Json(List<AnswerModel> ans) {
@@ -201,6 +202,12 @@ class _ApplicationState extends State<Application> {
                         "Please answer the questions below by clearly marking an ‘x’ in the box ( ) that best describes your experience withneuropathic pain, thinking about the last 7 days, including today. Please make sure you answer each question.",
                         style: TextStyle(fontSize: 16),
                       ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        context.read<FormCubit>().getForms();
+                      },
+                      child: const Text('Get Forms'),
                     ),
                     const SizedBox(height: 18),
                     LayoutBuilder(
