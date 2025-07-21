@@ -1,7 +1,15 @@
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+class BodyLabel {
+  final String text;
+  final Offset position;
+
+  BodyLabel({required this.text, required this.position});
+}
 
 class BodyGridCanvasWidget extends StatefulWidget {
   const BodyGridCanvasWidget({super.key, required this.imagePath});
@@ -17,7 +25,18 @@ class _BodyGridCanvasWidgetState extends State<BodyGridCanvasWidget> {
   ByteData? imagePixels;
 
   final double canvasWidth = 300;
-  final double canvasHeight = 800;
+  final double canvasHeight = 580;
+  final List<BodyLabel> bodyLabels = [
+    BodyLabel(text: 'หัว', position: Offset(130, 20)),
+    BodyLabel(text: 'คอ', position: Offset(135, 70)),
+    BodyLabel(text: 'ไหล่', position: Offset(50, 80)),
+    BodyLabel(text: 'แขน', position: Offset(30, 150)),
+    BodyLabel(text: 'ศอก', position: Offset(25, 200)),
+    BodyLabel(text: 'หน้าอก', position: Offset(110, 120)),
+    BodyLabel(text: 'น่อง', position: Offset(130, 300)),
+    BodyLabel(text: 'ขา', position: Offset(130, 350)),
+    BodyLabel(text: 'เท้า', position: Offset(130, 420)),
+  ];
 
   @override
   void initState() {
@@ -62,15 +81,12 @@ class _BodyGridCanvasWidgetState extends State<BodyGridCanvasWidget> {
 
     final pixelOffset = (y * bodyImage!.width + x) * 4;
 
-    final r = imagePixels!.getUint8(pixelOffset);
-    final g = imagePixels!.getUint8(pixelOffset + 1);
-    final b = imagePixels!.getUint8(pixelOffset + 2);
+    // final r = imagePixels!.getUint8(pixelOffset);
+    // final g = imagePixels!.getUint8(pixelOffset + 1);
+    // final b = imagePixels!.getUint8(pixelOffset + 2);
     final a = imagePixels!.getUint8(pixelOffset + 3);
 
-    final bool isWhite = (r > 240 && g > 240 && b > 240);
     final bool isTransparent = a > 10;
-
-    final bool isBody = !(isWhite || isTransparent);
 
     if (isTransparent) {
       setState(() {
@@ -79,19 +95,35 @@ class _BodyGridCanvasWidgetState extends State<BodyGridCanvasWidget> {
     }
   }
 
+  void _clearPoints() {
+    setState(() {
+      circlePoints.clear();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    context.locale;
     return Center(
-      child: GestureDetector(
-        onTapDown: _handleTapDown,
-        child: CustomPaint(
-          size: Size(canvasWidth, canvasHeight),
-          painter: BodyGridPainter(
-            bodyImage: bodyImage,
-            points: circlePoints,
-            canvasSize: Size(canvasWidth, canvasHeight),
+      child: Column(
+        children: [
+          GestureDetector(
+            onTapDown: _handleTapDown,
+            child: CustomPaint(
+              size: Size(canvasWidth, canvasHeight),
+              painter: BodyGridPainter(
+                bodyImage: bodyImage,
+                points: circlePoints,
+                canvasSize: Size(canvasWidth, canvasHeight),
+                labels: bodyLabels,
+              ),
+            ),
           ),
-        ),
+          ElevatedButton(
+            onPressed: circlePoints.isNotEmpty ? _clearPoints : null,
+            child: Text('questionire.button.clear'.tr()),
+          ),
+        ],
       ),
     );
   }
@@ -101,11 +133,13 @@ class BodyGridPainter extends CustomPainter {
   final ui.Image? bodyImage;
   final List<Offset> points;
   final Size canvasSize;
+  final List<BodyLabel> labels;
 
   BodyGridPainter({
     required this.bodyImage,
     required this.points,
     required this.canvasSize,
+    required this.labels,
   });
 
   @override
@@ -132,6 +166,26 @@ class BodyGridPainter extends CustomPainter {
         image: bodyImage!,
         fit: BoxFit.fill,
       );
+    }
+
+    for (final label in labels) {
+      final textSpan = TextSpan(
+        text: label.text,
+        style: TextStyle(
+          color: Colors.blue,
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+          backgroundColor: Colors.white.withOpacity(0.5),
+        ),
+      );
+
+      final textPainter = TextPainter(
+        text: textSpan,
+        textDirection: ui.TextDirection.ltr,
+      );
+
+      textPainter.layout();
+      textPainter.paint(canvas, label.position);
     }
 
     // Draw points

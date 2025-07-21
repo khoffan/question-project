@@ -1,9 +1,11 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class ChoiceAnswerWidget extends StatefulWidget {
-  const ChoiceAnswerWidget({super.key, this.onAnswer});
+  const ChoiceAnswerWidget({super.key, this.onAnswer, this.initialAnswerValue});
 
   final ValueChanged<int?>? onAnswer;
+  final int? initialAnswerValue;
 
   @override
   State<ChoiceAnswerWidget> createState() => _ChoiceAnswerWidgetState();
@@ -11,6 +13,12 @@ class ChoiceAnswerWidget extends StatefulWidget {
 
 class _ChoiceAnswerWidgetState extends State<ChoiceAnswerWidget> {
   int? _selectedChoiceValue;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedChoiceValue = widget.initialAnswerValue;
+  }
 
   void _handleChoiceSelection(int value) {
     setState(() {
@@ -21,6 +29,7 @@ class _ChoiceAnswerWidgetState extends State<ChoiceAnswerWidget> {
 
   @override
   Widget build(BuildContext context) {
+    context.locale;
     return LayoutBuilder(
       builder: (context, constraints) {
         final double horizontalPadding =
@@ -33,35 +42,35 @@ class _ChoiceAnswerWidgetState extends State<ChoiceAnswerWidget> {
             children: [
               _buildChoice(
                 image: "slight",
-                text: "Constant pain with slight fluctuations",
+                text: "questionire.3.choice.1".tr(),
                 number: 1,
                 onAnswer: _handleChoiceSelection,
               ),
               const SizedBox(height: 16),
               _buildChoice(
                 image: "large",
-                text: "Constant pain with large fluctuations",
+                text: "questionire.3.choice.2".tr(),
                 number: 2,
                 onAnswer: _handleChoiceSelection,
               ),
               const SizedBox(height: 16),
               _buildChoice(
                 image: "pain_peak",
-                text: "Constant pain with pain peaks",
+                text: "questionire.3.choice.3".tr(),
                 number: 3,
                 onAnswer: _handleChoiceSelection,
               ),
               const SizedBox(height: 16),
               _buildChoice(
                 image: "pain_between",
-                text: "Pain peaks without pain between them",
+                text: "questionire.3.choice.4".tr(),
                 number: 4,
                 onAnswer: _handleChoiceSelection,
               ),
               const SizedBox(height: 16),
               _buildChoice(
                 image: "",
-                text: "None of these pictures describe my pain",
+                text: "questionire.3.choice.5".tr(),
                 number: 5,
                 onAnswer: _handleChoiceSelection,
               ),
@@ -104,7 +113,7 @@ class _ChoiceAnswerWidgetState extends State<ChoiceAnswerWidget> {
                 ),
                 const SizedBox(height: 5),
               ],
-              Text(text),
+              Text(text.tr()),
             ],
           ),
         ],
@@ -152,7 +161,7 @@ class _ChoiceAnswerWidgetState extends State<ChoiceAnswerWidget> {
                     ),
                     const SizedBox(width: 16),
                   ],
-                  Text(text),
+                  Text(text.tr()),
                 ],
               ),
         ],

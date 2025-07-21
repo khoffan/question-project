@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 // นี่คือวิดเจ็ตแสดงผลมาตรวัดความเจ็บปวดที่สามารถคลิกได้และตอบสนองต่อขนาดหน้าจอ
@@ -47,6 +48,7 @@ class _LavelPainWidgetState extends State<LavelPainWidget> {
 
   @override
   Widget build(BuildContext context) {
+    context.locale;
     return LayoutBuilder(
       builder: (context, constraints) {
         // final double availableWidth =
@@ -84,7 +86,7 @@ class _LavelPainWidgetState extends State<LavelPainWidget> {
   double calculateSidePadding(double maxWidth) {
     const double baseWidth = 1188;
     const double stepWidth = 200; // ทุก ๆ 200px ลดลงทีละ 10
-    const double startPadding = 85;
+    const double startPadding = 55;
     const double minPadding = 20;
 
     // คำนวณจำนวนช่วงที่ลดลง
@@ -185,10 +187,6 @@ class _LavelPainWidgetState extends State<LavelPainWidget> {
                                   color: Colors.black,
                                 ),
                               ),
-                              activeColor:
-                                  Colors.blue[100], // สีพื้นหลังเมื่อถูกเลือก
-                              checkColor:
-                                  Colors.blue[700], // สีของเครื่องหมายถูก
                               materialTapTargetSize:
                                   MaterialTapTargetSize
                                       .shrinkWrap, // ให้ขนาดเล็กลง

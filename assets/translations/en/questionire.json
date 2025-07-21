@@ -1,0 +1,412 @@
+{
+    "questionire": {
+        "title": "PAIN QUESTIONNAIRE",
+        "subtitle": "You have been told by your doctor that you have a type of pain called \"Neuropathic pain\". This questionnaire asks you about this neuropathic pain and related unpleasant sensations (for example, tingling or numbness). Please make sure you think only about this pain and these types of sensations when you answer these questions, and not about any other pain or sensations you might feel.",
+        "detail": "Please answer the questions below by clearly marking an ‘x’ in the box ( ) that best describes your experience with neuropathic pain, thinking about the last 7 days, including today. Please make sure you answer each question.",
+        "yes_no": {
+            "yes": "Yes",
+            "no": "No"
+        },
+        "1": {
+            "numberQuestion": "1",
+            "question": "Please select the number that best describes your pain on average in the last 7 days.",
+            "questionHighlight": {
+                "text": "your pain on average"
+            },
+            "labelLeft": "No Pain",
+            "labelRight": "Extreme Pain"
+        },
+        "2": {
+            "numberQuestion": "2",
+            "question": "Please select the number that best describes your pain at its worst in the last 7 days.",
+            "questionHighlight": {
+                "text": "your pain at its worst"
+            },
+            "labelLeft": "No Pain",
+            "labelRight": "Extreme Pain"
+        },
+        "3": {
+            "numberQuestion": "3",
+            "question": "Please choose the picture(s) that best describe(s) your experience of pain in the last 7 days.",
+            "questionHighlight": {
+                "text": "your experience of pain"
+            },
+            "choice": {
+                "1": "Constant pain with slight fluctuations",
+                "2": "Constant pain with large fluctuations",
+                "3": "Constant pain with pain peaks",
+                "4": "Pain peaks without pain between them",
+                "5": "None of these pictures describe my pain"
+            }
+        },
+        "4": {
+            "numberQuestion": "4",
+            "question": "Please mark with a circle or cross the area(s) on the figure where you have had the worst neuropathic pain and/or unpleasant sensations in the last 7 days. If your pain spreads to different parts of your body, please show this on the figure with arrows (->->), showing the direction in which it spreads.",
+            "questionHighlight": {
+                "text": "circle or cross the area(s)",
+                "text2": "worst neuropathic pain and/or unpleasant sensations in the last 7 days.",
+                "text3": "arrows (->->),",
+                "underline": "neuropathic pain and/or unpleasant sensations"
+            }
+        },
+        "5a": {
+            "numberQuestion": "5a",
+            "question": "Please select the number that best describes your pain on average in the last 7 days.",
+            "questionHighlight": {
+                "text": "your pain on average"
+            },
+            "labelLeft": "No",
+            "labelRight": "Yes"
+        },
+        "5b": {
+            "numberQuestion": "5b",
+            "question": "Please select the number that best describes this burning sensation at its worst in the last 7 days.",
+            "questionHighlight": {
+                "text": "this burning sensation at its worst"
+            },
+            "labelLeft": "No burning sensation",
+            "labelRight": "Extreme burning sensation"
+        },
+        "6a": {
+            "numberQuestion": "6a",
+            "question": "Have you experienced tingling in the last 7 days?",
+            "questionHighlight": {
+                "text": "tingling"
+            },
+            "labelLeft": "No",
+            "labelRight": "Yes"
+        },
+        "6b": {
+            "numberQuestion": "6b",
+            "question": "Please select the number that best describes this tingling at its worst in the last 7 days.",
+            "questionHighlight": {
+                "text": "this tingling at its worst"
+            },
+            "labelLeft": "No tingling",
+            "labelRight": "Extreme tingling"
+        },
+        "7a": {
+            "numberQuestion": "7a",
+            "question": "Have you experienced a lack of sensation (numbness) in the last 7 days?",
+            "questionHighlight": {
+                "text": "a lack of sensation (numbness)"
+            },
+            "labelLeft": "No",
+            "labelRight": "Yes"
+        },
+        "7b": {
+            "numberQuestion": "7b",
+            "question": "Please select the number that best describes this lack of sensation (numbness) at its worst in the last 7 days.",
+            "questionHighlight": {
+                "text": "this lack of sensation (numbness) at its worst"
+            },
+            "labelLeft": "No numbness",
+            "labelRight": "Extreme numbness"
+        },
+        "7c": {
+            "numberQuestion": "7c",
+            "question": "Have you experienced pain within a numb area in your body in the last 7 days?",
+            "questionHighlight": {
+                "text": "pain within a numb area"
+            },
+            "labelLeft": "No",
+            "labelRight": "Yes"
+        },
+        "7d": {
+            "numberQuestion": "7d",
+            "question": "Please select the number that best describes this pain at its worst in the last 7 days.",
+            "questionHighlight": {
+                "text": "this pain at its worst"
+            },
+            "labelLeft": "No pain",
+            "labelRight": "Extreme pain"
+        },
+        "8a": {
+            "numberQuestion": "8a",
+            "question": "Have you experienced a painful electric-shock sensation in the last 7 days?",
+            "questionHighlight": {
+                "text": "a painful electric-shock sensation"
+            },
+            "labelLeft": "No",
+            "labelRight": "Yes"
+        },
+        "8b": {
+            "numberQuestion": "8b",
+            "question": "Please select the number that best describes this electric-shock sensation at itsworst in the last 7 days.",
+            "questionHighlight": {
+                "text": "this electric-shock sensation at itsworst"
+            },
+            "labelLeft": "No electric-shock sensation",
+            "labelRight": "Extreme electric-shock sensation"
+        },
+        "9a": {
+            "numberQuestion": "9a",
+            "question": "Have you experienced itching in the last 7 days?",
+            "questionHighlight": {
+                "text": "itching"
+            },
+            "labelLeft": "No",
+            "labelRight": "Yes"
+        },
+        "9b": {
+            "numberQuestion": "9b",
+            "question": "Please select the number that best describes this itching at its worst in the last 7 days",
+            "questionHighlight": {
+                "text": "this itching at its worst"
+            },
+            "labelLeft": "No itching",
+            "labelRight": "Extreme itching"
+        },
+        "10a": {
+            "numberQuestion": "10a",
+            "question": "Have you experienced a squeezing sensation in the last 7 days?",
+            "questionHighlight": {
+                "text": "squeezing sensation"
+            },
+            "labelLeft": "No",
+            "labelRight": "Yes"
+        },
+        "10b": {
+            "numberQuestion": "10b",
+            "question": "Please select the number that best describes this sensation at its worst in the last 7 days",
+            "questionHighlight": {
+                "text": "this sensation at its worst"
+            },
+            "labelLeft": "No squeezing",
+            "labelRight": "Extreme squeezing"
+        },
+        "11a": {
+            "numberQuestion": "11a",
+            "question": "Have you experienced an internal sensation of pressure in the last 7 days?",
+            "questionHighlight": {
+                "text": "an internal sensation of pressure"
+            },
+            "labelLeft": "No",
+            "labelRight": "Yes"
+        },
+        "11b": {
+            "numberQuestion": "11b",
+            "question": "Please select the number that best describes this sensation at its worst in the last 7 days",
+            "questionHighlight": {
+                "text": "this sensation at its worst"
+            },
+            "labelLeft": "No internal pressure",
+            "labelRight": "Extreme external pressure"
+        },
+        "12a": {
+            "numberQuestion": "12a",
+            "question": "Have you experienced a feeling as if you have swelling in the last 7 days?",
+            "questionHighlight": {
+                "text": "a feeling as if you have swelling"
+            },
+            "labelLeft": "No",
+            "labelRight": "Yes"
+        },
+        "12b": {
+            "numberQuestion": "12b",
+            "question": "Please select the number that best describes this feeling at its worst in the last 7 days.",
+            "questionHighlight": {
+                "text": "this feeling at its worst"
+            },
+            "labelLeft": "No swelling feeling",
+            "labelRight": "Extreme swelling feeling"
+        },
+        "13a": {
+            "numberQuestion": "13a",
+            "question": "Have you experienced a sensation of tense muscles in the last 7 days?",
+            "questionHighlight": {
+                "text": "a sensation of tense muscles"
+            },
+            "labelLeft": "No",
+            "labelRight": "Yes"
+        },
+        "13b": {
+            "numberQuestion": "13b",
+            "question": "Please select the number that best describes this sensation at its worst in the last 7 days.",
+            "questionHighlight": {
+                "text": "this sensation at its worst"
+            },
+            "labelLeft": "No sensation of tense muscles",
+            "labelRight": "Extreme sensation of tense muscles"
+        },
+        "14a": {
+            "numberQuestion": "14a",
+            "question": "Have you recently experienced a sudden pain that was caused by moving or changing positions in the last 7 days?",
+            "questionHighlight": {
+                "text": "a sudden pain that was caused by moving or changing positions"
+            },
+            "labelLeft": "No",
+            "labelRight": "Yes"
+        },
+        "14b": {
+            "numberQuestion": "14b",
+            "question": "Please select the number that best describes this pain at its worst in the last 7 days.",
+            "questionHighlight": {
+                "text": "this pain at its worst"
+            },
+            "labelLeft": "No pain",
+            "labelRight": "Extreme pain"
+        },
+        "14c": {
+            "numberQuestion": "14c",
+            "question": "Did this pain spread into your hands in the last 7 days?",
+            "questionHighlight": {
+                "text": "spread",
+                "text2": "hands"
+            },
+            "labelLeft": "No",
+            "labelRight": "Yes"
+        },
+        "14d": {
+            "numberQuestion": "14d",
+            "question": "Did this pain spread into your feet in the last 7 days?",
+            "questionHighlight": {
+                "text": "spread",
+                "text2": "feet"
+            },
+            "labelLeft": "No",
+            "labelRight": "Yes"
+        },
+        "15a": {
+            "numberQuestion": "15a",
+            "question": "Have you experienced a sudden pain that occurred for no particular reason (without moving or changing positions) in the last 7 days?",
+            "questionHighlight": {
+                "text": "a sudden pain that occurred for no particular reason (without moving or changing positions)"
+            },
+            "labelLeft": "No",
+            "labelRight": "Yes"
+        },
+        "15b": {
+            "numberQuestion": "15b",
+            "question": "Please select the number that best describes this pain at its worst in the last 7 days.",
+            "questionHighlight": {
+                "text": "this pain at its worst"
+            },
+            "labelLeft": "No pain",
+            "labelRight": "Extreme pain"
+        },
+        "15c": {
+            "numberQuestion": "15c",
+            "question": "Did this pain spread into your hands in the last 7 days?",
+            "questionHighlight": {
+                "text": "spread"
+            },
+            "labelLeft": "No",
+            "labelRight": "Yes"
+        },
+        "15d": {
+            "numberQuestion": "15d",
+            "question": "Did this pain spread into your feet in the last 7 days?",
+            "questionHighlight": {
+                "text": "spread"
+            },
+            "labelLeft": "No",
+            "labelRight": "Yes"
+        },
+        "16a": {
+            "numberQuestion": "16a",
+            "question": "Have you recently experienced pain when something brushed lightly against you (for example, when getting dressed) in the last 7 days?",
+            "questionHighlight": {
+                "text": "pain when something brushed lightly against you"
+            },
+            "labelLeft": "No",
+            "labelRight": "Yes"
+        },
+        "16b": {
+            "numberQuestion": "16b",
+            "question": "Please select the number that best describes this pain at its worst in the last 7 days.",
+            "questionHighlight": {
+                "text": "this pain at its worst"
+            },
+            "labelLeft": "No pain",
+            "labelRight": "Extreme pain"
+        },
+        "17a": {
+            "numberQuestion": "17a",
+            "question": "Have you experienced pain caused by slight pressure on your skin (a finger pushing against you, for example) in the last 7 days?",
+            "questionHighlight": {
+                "text": "pain caused by slight pressure on your skin"
+            },
+            "labelLeft": "No",
+            "labelRight": "Yes"
+        },
+        "17b": {
+            "numberQuestion": "17b",
+            "question": "Please select the number that best describes this pain at its worst in the last 7 days.",
+            "questionHighlight": {
+                "text": "this pain at its worst"
+            },
+            "labelLeft": "No pain",
+            "labelRight": "Extreme pain"
+        },
+        "18a": {
+            "numberQuestion": "18a",
+            "question": "Have you recently experienced pain caused by a pointed object touching your skin (the point of a pencil, or the prongs of a fork for example) in the last 7 days?",
+            "questionHighlight": {
+                "text": "pain caused by a pointed object touching your skin",
+                "underline": "touching"
+            },
+            "labelLeft": "No",
+            "labelRight": "Yes"
+        },
+        "18b": {
+            "numberQuestion": "18b",
+            "question": "Please select the number that best describes this pain at its worst in the last 7 days.",
+            "questionHighlight": {
+                "text": "this pain at its worst"
+            },
+            "labelLeft": "No pain",
+            "labelRight": "Extreme pain"
+        },
+        "19a": {
+            "numberQuestion": "19a",
+            "question": "Have you experienced pain caused by coming into contact with something cold (cold water, or cold wind for example) in the last 7 days?",
+            "questionHighlight": {
+                "text": "pain caused by coming into contact with something cold",
+                "underline": "contact with something cold"
+            },
+            "labelLeft": "No",
+            "labelRight": "Yes"
+        },
+        "19b": {
+            "numberQuestion": "19b",
+            "question": "Please select the number that best describes this pain at its worst in the last 7 days.",
+            "questionHighlight": {
+                "text": "this pain at its worst"
+            },
+            "labelLeft": "No pain",
+            "labelRight": "Extreme Pain"
+        },
+        "20a": {
+            "numberQuestion": "20a",
+            "question": "Have you experienced pain caused by coming into contact with something warm (warm water, when showering for example) in the last 7 days?",
+            "questionHighlight": {
+                "text": "pain caused by coming into contact with something warm",
+                "underline": "coming into contact with something warm"
+            }
+        },
+        "20b": {
+            "numberQuestion": "20b",
+            "question": "Please select the number that best describes this pain at its worst in the last 7 days.",
+            "questionHighlight": {
+                "text": "this pain at its worst"
+            },
+            "labelLeft": "No pain",
+            "labelRight": "Extreme Pain"
+        },
+        "end": {
+            "title": "THANK YOU FOR YOUR PARTICIPATION",
+            "detail": "If you have any questions about this questionnaire or its contents, please ask the doctor who is treating you for your neuropathic pain.",
+            "subdetail": "If you have any comments about this questionnaire, please write them in the box below.",
+            "text_box": {
+                "title": "Comments about the PainPredict questionnaire:"
+            }
+        },
+        "button": {
+            "clear": "Clear",
+            "submit": "Submit",
+            "export_json": "Export JSON file",
+            "export_csv": "Export CSV file"
+        }
+    }
+}

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:questionnaire/model/question_model.dart';
+import 'package:questionnaire/widget/body_grid_canvas_widget.dart';
 import 'package:questionnaire/widget/choice_answer_widget.dart';
 import 'package:questionnaire/widget/level_pain_answer_widget.dart';
 import 'package:questionnaire/widget/yes_no_question_widget.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class QuestionWidget extends StatefulWidget {
   const QuestionWidget({super.key, required this.question, this.onAnswer});
@@ -19,6 +21,7 @@ class _QuestionWidgetState extends State<QuestionWidget> {
 
   @override
   Widget build(BuildContext context) {
+    context.locale;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -52,6 +55,9 @@ class _QuestionWidgetState extends State<QuestionWidget> {
             ] else
               const SizedBox(height: 40),
           ],
+        ] else if (widget.question.useBodyGrid) ...[
+          _bodyGrid(widget.question),
+          const SizedBox(height: 40),
         ] else if (widget.question.useChoice) ...[
           RichText(
             text: TextSpan(
@@ -81,6 +87,53 @@ class _QuestionWidgetState extends State<QuestionWidget> {
           _buildLavelChoice(widget.question, null),
         ],
       ],
+    );
+  }
+
+  Widget _bodyGrid(Question question) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth <= 680) {
+          return Column(
+            children: [
+              RichText(
+                text: TextSpan(
+                  style: TextStyle(fontSize: 16),
+                  children: _buildHightlightText(
+                    question,
+                    question.questionHighlight,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
+              BodyGridCanvasWidget(imagePath: 'assets/images/body_front.png'),
+              const SizedBox(height: 10),
+              BodyGridCanvasWidget(imagePath: 'assets/images/body_back.png'),
+            ],
+          );
+        }
+        return Column(
+          children: [
+            RichText(
+              text: TextSpan(
+                style: TextStyle(fontSize: 16),
+                children: _buildHightlightText(
+                  question,
+                  question.questionHighlight,
+                ),
+              ),
+            ),
+            const SizedBox(height: 18),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                BodyGridCanvasWidget(imagePath: 'assets/images/body_front.png'),
+                BodyGridCanvasWidget(imagePath: 'assets/images/body_back.png'),
+              ],
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -136,8 +189,8 @@ class _QuestionWidgetState extends State<QuestionWidget> {
         ),
         const SizedBox(height: 40),
         LavelPainWidget(
-          labelLeft: question.labelLeft,
-          labelRight: question.labelRight,
+          labelLeft: question.labelLeft.tr(),
+          labelRight: question.labelRight.tr(),
           onPainSelected: (value) {
             setState(() {
               _selectedPainValue = value;
@@ -157,9 +210,11 @@ class _QuestionWidgetState extends State<QuestionWidget> {
   ) {
     List<TextSpan> spans = [];
 
+    final String translatedQuestion = question.question.tr();
+
     spans.add(
       TextSpan(
-        text: "${question.numberQuestion}. ",
+        text: "${question.numberQuestion.tr()}. ",
         style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.bold,
@@ -169,28 +224,42 @@ class _QuestionWidgetState extends State<QuestionWidget> {
     );
 
     if (hightlight.isEmpty) {
-      spans.add(TextSpan(text: question.question));
+      spans.add(TextSpan(text: translatedQuestion));
       return spans;
     }
 
+    final highlightConfig =
+        hightlight.map((e) {
+          return HightLightText(
+            text: e.text.tr(),
+            underline: e.underline.map((u) => u.tr()).toList(),
+          );
+        }).toList();
+
+    final List<String> translatedHighlightTexts =
+        hightlight
+            .map((h) => h.text.tr()) // แปลคีย์ของไฮไลต์แต่ละตัว
+            .where((text) => text.isNotEmpty)
+            .toList();
+
     final pattren = RegExp(
-      hightlight.map((e) => RegExp.escape(e.text)).join("|"),
+      translatedHighlightTexts.map((e) => RegExp.escape(e)).join("|"),
       caseSensitive: false,
     );
 
     int current = 0;
-    final matchs = pattren.allMatches(question.question);
+    final matchs = pattren.allMatches(translatedQuestion);
 
     for (final match in matchs) {
       if (match.start > current) {
         spans.add(
-          TextSpan(text: question.question.substring(current, match.start)),
+          TextSpan(text: translatedQuestion.substring(current, match.start)),
         );
       }
 
-      final matchedText = question.question.substring(match.start, match.end);
+      final matchedText = translatedQuestion.substring(match.start, match.end);
 
-      final hightlightText = hightlight.firstWhere(
+      final hightlightText = highlightConfig.firstWhere(
         (e) => e.text.toLowerCase() == matchedText.toLowerCase(),
         orElse: () => HightLightText(text: matchedText),
       );
@@ -242,8 +311,8 @@ class _QuestionWidgetState extends State<QuestionWidget> {
       current = match.end;
     }
 
-    if (current < question.question.length) {
-      spans.add(TextSpan(text: question.question.substring(current)));
+    if (current < translatedQuestion.length) {
+      spans.add(TextSpan(text: translatedQuestion.substring(current)));
     }
 
     return spans;

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class CommentBoxWidget extends StatefulWidget {
@@ -14,20 +15,21 @@ class _CommentBoxWidgetState extends State<CommentBoxWidget> {
 
   @override
   Widget build(BuildContext context) {
+    context.locale;
     return Column(
       children: [
         Text(
-          "THANK YOU FOR YOUR PARTICIPATION",
+          "questionire.end.title".tr(),
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 20),
         Text(
-          "If you have any questions about this questionnaire or its contents, please ask the doctor who is treating you for your neuropathic pain.",
+          "questionire.end.detail".tr(),
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         ),
         const SizedBox(height: 16),
         Text(
-          "If you have any comments about this questionnaire, please write them in the box below.",
+          "questionire.end.subdetail".tr(),
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         ),
         const SizedBox(height: 20),
@@ -42,7 +44,7 @@ class _CommentBoxWidgetState extends State<CommentBoxWidget> {
             child: TextFormField(
               decoration: InputDecoration(
                 border: InputBorder.none,
-                hintText: "Comments about the PainPredict questionnaire:",
+                hintText: "questionire.end.text_box.title".tr(),
                 contentPadding: const EdgeInsets.all(8),
               ),
               onFieldSubmitted: widget.onComment,

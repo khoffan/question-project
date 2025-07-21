@@ -1,123 +1,140 @@
 [
     {
-        "numberQuestion": "1",
-        "question": "Please select the number that best describes your pain on average in the last 7 days.",
+        "numberQuestion": "questionire.1.numberQuestion",
+        "question": "questionire.1.question",
         "questionHighlight": [
             {
-                "text": "your pain on average"
+                "text": "questionire.1.questionHighlight.text"
             }
         ],
-        "labelLeft": "No Pain",
-        "labelRight": "Extreme Pain"
+        "labelLeft": "questionire.1.labelLeft",
+        "labelRight": "questionire.1.labelRight"
     },
     {
-        "numberQuestion": "2",
-        "question": "Please select the number that best describes your pain at its worst in the last 7 days.",
+        "numberQuestion": "questionire.2.numberQuestion",
+        "question": "questionire.2.question",
         "questionHighlight": [
             {
-                "text": "your pain at its worst"
+                "text": "questionire.2.questionHighlight.text"
             }
         ],
-        "labelLeft": "No Pain",
-        "labelRight": "Extreme Pain"
+        "labelLeft": "questionire.2.labelLeft",
+        "labelRight": "questionire.2.labelRight"
     },
     {
-        "numberQuestion": "3",
-        "question": "Please choose the picture(s) that best describe(s) your experience of pain in the last 7 days.",
+        "numberQuestion": "questionire.3.numberQuestion",
+        "question": "questionire.3.question",
         "questionHighlight": [
             {
-                "text": "your experience of pain"
+                "text": "questionire.3.questionHighlight.text"
             }
         ],
         "useChoice": true
     },
     {
-        "numberQuestion": "5a",
-        "question": "Please select the number that best describes your pain on average in the last 7 days.",
+        "numberQuestion": "questionire.4.numberQuestion",
+        "question": "questionire.4.question",
         "questionHighlight": [
             {
-                "text": "your pain on average"
-            }
-        ],
-        "isYesnoQuestion": true,
-        "showSubQuestionOnYes": true,
-        "subQuestions": [
-            {
-                "numberQuestion": "5b",
-                "question": "Please select the number that best describes this burning sensation at its worst in the last 7 days.",
-                "questionHighlight": [
-                    {
-                        "text": "this burning sensation at its worst"
-                    }
-                ],
-                "labelLeft": "No burning sensation",
-                "labelRight": "Extreme burning sensation"
-            }
-        ]
-    },
-    {
-        "numberQuestion": "6a",
-        "question": "Have you experienced tingling in the last 7 days?",
-        "questionHighlight": [
-            {
-                "text": "tingling"
-            }
-        ],
-        "isYesnoQuestion": true,
-        "showSubQuestionOnYes": true,
-        "subQuestions": [
-            {
-                "numberQuestion": "6b",
-                "question": "Please select the number that best describes this tingling at its worst in the last 7 days.",
-                "questionHighlight": [
-                    {
-                        "text": "this tingling at its worst"
-                    }
-                ],
-                "labelLeft": "No tingling",
-                "labelRight": "Extreme tingling"
-            }
-        ]
-    },
-    {
-        "numberQuestion": "7a",
-        "question": "Have you experienced a lack of sensation (numbness) in the last 7 days?",
-        "questionHighlight": [
-            {
-                "text": "a lack of sensation (numbness)"
-            }
-        ],
-        "isYesnoQuestion": true,
-        "showSubQuestionOnYes": true,
-        "subQuestions": [
-            {
-                "numberQuestion": "7b",
-                "question": "Please select the number that best describes this lack of sensation (numbness) at its worst in the last 7 days.",
-                "questionHighlight": [
-                    {
-                        "text": "this lack of sensation (numbness) at its worst"
-                    }
-                ],
-                "labelLeft": "No numbness",
-                "labelRight": "Extreme numbness"
+                "text": "questionire.4.questionHighlight.text"
             },
             {
-                "numberQuestion": "7c",
-                "question": "Have you experienced pain within a numb area in your body in the last 7 days?",
+                "text": "questionire.4.questionHighlight.text2",
+                "underline": ["questionire.4.questionHighlight.underline"]
+            },
+            {
+                "text": "questionire.4.questionHighlight.text3"
+            }
+        ],
+        "useBodyGrid": true
+    },
+    {
+        "numberQuestion": "questionire.5a.numberQuestion",
+        "question": "questionire.5a.question",
+        "questionHighlight": [
+            {
+                "text": "questionire.5a.questionHighlight.text"
+            }
+        ],
+        "isYesnoQuestion": true,
+        "showSubQuestionOnYes": true,
+        "subQuestions": [
+            {
+                "numberQuestion": "questionire.5b.numberQuestion",
+                "question": "questionire.5b.question",
                 "questionHighlight": [
                     {
-                        "text": "pain within a numb area"
+                        "text": "questionire.5b.questionHighlight.text"
+                    }
+                ],
+                "labelLeft": "questionire.5b.labelLeft",
+                "labelRight": "questionire.5b.labelRight"
+            }
+        ]
+    },
+    {
+        "numberQuestion": "questionire.6a.numberQuestion",
+        "question": "questionire.6a.question",
+        "questionHighlight": [
+            {
+                "text": "questionire.6a.questionHighlight.text"
+            }
+        ],
+        "isYesnoQuestion": true,
+        "showSubQuestionOnYes": true,
+        "subQuestions": [
+            {
+                "numberQuestion": "questionire.6b.numberQuestion",
+                "question": "questionire.6b.question",
+                "questionHighlight": [
+                    {
+                        "text": "questionire.6b.questionHighlight.text"
+                    }
+                ],
+                "labelLeft": "questionire.6b.labelLeft",
+                "labelRight": "questionire.6b.labelRight"
+            }
+        ]
+    },
+    {
+        "numberQuestion": "questionire.7a.numberQuestion",
+        "question": "questionire.7a.question",
+        "questionHighlight": [
+            {
+                "text": "questionire.7a.questionHighlight.text"
+            }
+        ],
+        "isYesnoQuestion": true,
+        "showSubQuestionOnYes": true,
+        "subQuestions": [
+            {
+                "numberQuestion": "questionire.7b.numberQuestion",
+                "question": "questionire.7b.question",
+                "questionHighlight": [
+                    {
+                        "text": "questionire.7b.questionHighlight.text"
+                    }
+                ],
+                "labelLeft": "questionire.7b.labelLeft",
+                "labelRight": "questionire.7b.labelRight"
+            },
+            {
+                "numberQuestion": "questionire.7c.numberQuestion",
+                "question": "questionire.7c.question",
+                "questionHighlight": [
+                    {
+                        "text": "questionire.7c.questionHighlight.text"
                     }
                 ],
                 "isYesnoQuestion": true,
                 "showSubQuestionOnYes": true,
                 "subQuestions": [
                     {
-                        "numberQuestion": "7d",
-                        "question": "Please select the number that best describes this pain at its worst in the last 7 days.",
+                        "numberQuestion": "questionire.7d.numberQuestion",
+                        "question": "questionire.7d.question",
                         "questionHighlight": [
                             {
-                                "text": "this pain at its worst"
+                                "text": "questionire.7d.questionHighlight.text"
                             }
                         ],
                         "labelLeft": "No pain",
@@ -128,177 +145,229 @@
         ]
     },
     {
-        "numberQuestion": "8a",
-        "question": "Have you experienced a painful electric-shock sensation in the last 7 days?",
+        "numberQuestion": "questionire.8a.numberQuestion",
+        "question": "questionire.8a.question",
         "questionHighlight": [
             {
-                "text": "a painful electric-shock sensation"
+                "text": "questionire.8a.questionHighlight.text"
             }
         ],
         "isYesnoQuestion": true,
         "showSubQuestionOnYes": true,
         "subQuestions": [
             {
-                "numberQuestion": "8b",
-                "question": "Please select the number that best describes this electric-shock sensation at itsworst in the last 7 days.",
+                "numberQuestion": "questionire.8b.numberQuestion",
+                "question": "questionire.8b.question",
                 "questionHighlight": [
                     {
-                        "text": "this electric-shock sensation at itsworst"
+                        "text": "questionire.8b.questionHighlight.text"
                     }
                 ],
-                "labelLeft": "No electric-shock sensation",
-                "labelRight": "Extreme electric-shock sensation"
+                "labelLeft": "questionire.8b.labelLeft",
+                "labelRight": "questionire.8b.labelRight"
             }
         ]
     },
     {
-        "numberQuestion": "9a",
-        "question": "Have you experienced itching in the last 7 days?",
+        "numberQuestion": "questionire.9a.numberQuestion",
+        "question": "questionire.9a.question",
         "questionHighlight": [
             {
-                "text": "itching"
+                "text": "questionire.9a.questionHighlight.text"
             }
         ],
         "isYesnoQuestion": true,
         "showSubQuestionOnYes": true,
         "subQuestions": [
             {
-                "numberQuestion": "9b",
-                "question": "Please select the number that best describes this itching at its worst in the last 7 days",
+                "numberQuestion": "questionire.9b.numberQuestion",
+                "question": "questionire.9b.question",
                 "questionHighlight": [
                     {
-                        "text": "this itching at its worst"
+                        "text": "questionire.9b.questionHighlight.text"
                     }
                 ],
-                "labelLeft": "No itching",
-                "labelRight": "Extreme itching"
+                "labelLeft": "questionire.9b.labelLeft",
+                "labelRight": "questionire.9b.labelRight"
             }
         ]
     },
     {
-        "numberQuestion": "10a",
-        "question": "Have you experienced a squeezing sensation in the last 7 days?",
+        "numberQuestion": "questionire.10a.numberQuestion",
+        "question": "questionire.10a.question",
         "questionHighlight": [
             {
-                "text": "squeezing sensation"
+                "text": "questionire.10a.questionHighlight.text"
             }
         ],
         "isYesnoQuestion": true,
         "showSubQuestionOnYes": true,
         "subQuestions": [
             {
-                "numberQuestion": "10b",
-                "question": "Please select the number that best describes this sensation at its worst in the last 7 days",
+                "numberQuestion": "questionire.10b.numberQuestion",
+                "question": "questionire.10b.question",
                 "questionHighlight": [
                     {
-                        "text": "this sensation at its worst"
+                        "text": "questionire.10b.questionHighlight.text"
                     }
                 ],
-                "labelLeft": "No squeezing",
-                "labelRight": "Extreme squeezing"
+                "labelLeft": "questionire.10b.labelLeft",
+                "labelRight": "questionire.10b.labelRight"
             }
         ]
     },
     {
-        "numberQuestion": "11a",
-        "question": "Have you experienced an internal sensation of pressure in the last 7 days?",
+        "numberQuestion": "questionire.11a.numberQuestion",
+        "question": "questionire.11a.question",
         "questionHighlight": [
             {
-                "text": "an internal sensation of pressure"
+                "text": "questionire.11a.questionHighlight.text"
             }
         ],
         "isYesnoQuestion": true,
         "showSubQuestionOnYes": true,
         "subQuestions": [
             {
-                "numberQuestion": "11b",
-                "question": "Please select the number that best describes this sensation at its worst in the last 7 days",
+                "numberQuestion": "questionire.11b.numberQuestion",
+                "question": "questionire.11b.question",
                 "questionHighlight": [
                     {
-                        "text": "this sensation at its worst"
+                        "text": "questionire.11b.questionHighlight.text"
                     }
                 ],
-                "labelLeft": "No internal pressure",
-                "labelRight": "Extreme external pressure"
+                "labelLeft": "questionire.11b.labelLeft",
+                "labelRight": "questionire.11b.labelRight"
             }
         ]
     },
     {
-        "numberQuestion": "12a",
-        "question": "Have you experienced a feeling as if you have swelling in the last 7 days?",
+        "numberQuestion": "questionire.12a.numberQuestion",
+        "question": "questionire.12a.question",
         "questionHighlight": [
             {
-                "text": "a feeling as if you have swelling"
+                "text": "questionire.12a.questionHighlight.text"
             }
         ],
         "isYesnoQuestion": true,
         "showSubQuestionOnYes": true,
         "subQuestions": [
             {
-                "numberQuestion": "12b",
-                "question": "Please select the number that best describes this feeling at its worst in the last 7 days.",
+                "numberQuestion": "questionire.12b.numberQuestion",
+                "question": "questionire.12b.question",
                 "questionHighlight": [
                     {
-                        "text": "this feeling at its worst"
+                        "text": "questionire.12b.questionHighlight.text"
                     }
                 ],
-                "labelLeft": "No swelling feeling",
-                "labelRight": "Extreme swelling feeling"
+                "labelLeft": "questionire.12b.labelLeft",
+                "labelRight": "questionire.12b.labelRight"
             }
         ]
     },
     {
-        "numberQuestion": "13a",
-        "question": "Have you experienced a sensation of tense muscles in the last 7 days?",
+        "numberQuestion": "questionire.13a.numberQuestion",
+        "question": "questionire.13a.question",
         "questionHighlight": [
             {
-                "text": "a sensation of tense muscles"
+                "text": "questionire.13a.questionHighlight.text"
             }
         ],
         "isYesnoQuestion": true,
         "showSubQuestionOnYes": true,
         "subQuestions": [
             {
-                "numberQuestion": "13b",
-                "question": "Please select the number that best describes this sensation at its worst in the last 7 days.",
+                "numberQuestion": "questionire.13b.numberQuestion",
+                "question": "questionire.13b.question",
                 "questionHighlight": [
                     {
-                        "text": "this sensation at its worst"
+                        "text": "questionire.13b.questionHighlight.text"
                     }
                 ],
-                "labelLeft": "No sensation of tense muscles",
-                "labelRight": "Extreme sensation of tense muscles"
+                "labelLeft": "questionire.13b.labelLeft",
+                "labelRight": "questionire.13b.labelRight"
             }
         ]
     },
     {
-        "numberQuestion": "14a",
-        "question": "Have you recently experienced a sudden pain that was caused by moving or changing positions in the last 7 days?",
+        "numberQuestion": "questionire.14a.numberQuestion",
+        "question": "questionire.14a.question",
         "questionHighlight": [
             {
-                "text": "a sudden pain that was caused by moving or changing positions"
+                "text": "questionire.14a.questionHighlight.text"
             }
         ],
         "isYesnoQuestion": true,
         "showSubQuestionOnYes": true,
         "subQuestions": [
             {
-                "numberQuestion": "14b",
-                "question": "Please select the number that best describes this pain at its worst in the last 7 days.",
+                "numberQuestion": "questionire.14b.numberQuestion",
+                "question": "questionire.14b.question",
                 "questionHighlight": [
                     {
-                        "text": "this pain at its worst"
+                        "text": "questionire.14b.questionHighlight.text"
                     }
                 ],
-                "labelLeft": "No pain",
-                "labelRight": "Extreme pain"
+                "labelLeft": "questionire.14b.labelLeft",
+                "labelRight": "questionire.14b.labelRight"
             },
             {
-                "numberQuestion": "14c",
-                "question": "Did this pain spread into your hands in the last 7 days?",
+                "numberQuestion": "questionire.14c.numberQuestion",
+                "question": "questionire.14c.question",
                 "questionHighlight": [
                     {
-                        "text": "spread"
+                        "text": "questionire.14c.questionHighlight.text"
+                    },
+                    {
+                        "text": "questionire.14c.questionHighlight.text2"
+                    }
+                ],
+                "isYesnoQuestion": true,
+                "showSubQuestionOnYes": false
+            },
+            {
+                "numberQuestion": "questionire.14d.numberQuestion",
+                "question": "questionire.14d.question",
+                "questionHighlight": [
+                    {
+                        "text": "questionire.14d.questionHighlight.text"
+                    },
+                    {
+                        "text": "questionire.14d.questionHighlight.text2"
+                    }
+                ],
+                "isYesnoQuestion": true,
+                "showSubQuestionOnYes": false
+            }
+        ]
+    },
+    {
+        "numberQuestion": "questionire.15a.numberQuestion",
+        "question": "questionire.15a.question",
+        "questionHighlight": [
+            {
+                "text": "questionire.15a.questionHighlight.text"
+            }
+        ],
+        "isYesnoQuestion": true,
+        "showSubQuestionOnYes": true,
+        "subQuestions": [
+            {
+                "numberQuestion": "questionire.15b.numberQuestion",
+                "question": "questionire.15b.question",
+                "questionHighlight": [
+                    {
+                        "text": "questionire.15b.questionHighlight.text"
+                    }
+                ],
+                "labelLeft": "questionire.15b.labelLeft",
+                "labelRight": "questionire.15b.labelRight"
+            },
+            {
+                "numberQuestion": "questionire.15c.numberQuestion",
+                "question": "questionire.15c.question",
+                "questionHighlight": [
+                    {
+                        "text": "questionire.15c.questionHighlight.text"
                     },
                     {
                         "text": "hands"
@@ -308,11 +377,11 @@
                 "showSubQuestionOnYes": false
             },
             {
-                "numberQuestion": "14d",
-                "question": "Did this pain spread into your feet in the last 7 days?",
+                "numberQuestion": "questionire.15d.numberQuestion",
+                "question": "questionire.15d.question",
                 "questionHighlight": [
                     {
-                        "text": "spread"
+                        "text": "questionire.15d.questionHighlight.text"
                     },
                     {
                         "text": "feet"
@@ -324,177 +393,125 @@
         ]
     },
     {
-        "numberQuestion": "15a",
-        "question": "Have you experienced a sudden pain that occurred for no particular reason (without moving or changing positions) in the last 7 days?",
+        "numberQuestion": "questionire.16a.numberQuestion",
+        "question": "questionire.16a.question",
         "questionHighlight": [
             {
-                "text": "a sudden pain that occurred for no particular reason (without moving or changing positions)"
+                "text": "questionire.16a.questionHighlight.text"
             }
         ],
         "isYesnoQuestion": true,
         "showSubQuestionOnYes": true,
         "subQuestions": [
             {
-                "numberQuestion": "15b",
-                "question": "Please select the number that best describes this pain at its worst in the last 7 days.",
+                "numberQuestion": "questionire.16b.numberQuestion",
+                "question": "questionire.16b.question",
                 "questionHighlight": [
                     {
-                        "text": "this pain at its worst"
+                        "text": "questionire.16b.questionHighlight.text"
                     }
                 ],
-                "labelLeft": "No pain",
-                "labelRight": "Extreme pain"
-            },
-            {
-                "numberQuestion": "15c",
-                "question": "Did this pain spread into your hands in the last 7 days?",
-                "questionHighlight": [
-                    {
-                        "text": "spread"
-                    },
-                    {
-                        "text": "hands"
-                    }
-                ],
-                "isYesnoQuestion": true,
-                "showSubQuestionOnYes": false
-            },
-            {
-                "numberQuestion": "15d",
-                "question": "Did this pain spread into your feet in the last 7 days?",
-                "questionHighlight": [
-                    {
-                        "text": "spread"
-                    },
-                    {
-                        "text": "feet"
-                    }
-                ],
-                "isYesnoQuestion": true,
-                "showSubQuestionOnYes": false
+                "labelLeft": "questionire.16b.labelLeft",
+                "labelRight": "questionire.16b.labelRight"
             }
         ]
     },
     {
-        "numberQuestion": "16a",
-        "question": "Have you recently experienced pain when something brushed lightly against you (for example, when getting dressed) in the last 7 days?",
+        "numberQuestion": "questionire.17a.numberQuestion",
+        "question": "questionire.17a.question",
         "questionHighlight": [
             {
-                "text": "pain when something brushed lightly against you"
+                "text": "questionire.17a.questionHighlight.text"
             }
         ],
         "isYesnoQuestion": true,
         "showSubQuestionOnYes": true,
         "subQuestions": [
             {
-                "numberQuestion": "16b",
-                "question": "Please select the number that best describes this pain at its worst in the last 7 days.",
+                "numberQuestion": "questionire.17b.numberQuestion",
+                "question": "questionire.17b.question",
                 "questionHighlight": [
                     {
-                        "text": "this pain at its worst"
+                        "text": "questionire.17b.questionHighlight.text"
                     }
                 ],
-                "labelLeft": "No pain",
-                "labelRight": "Extreme pain"
+                "labelLeft": "questionire.17b.labelLeft",
+                "labelRight": "questionire.17b.labelRight"
             }
         ]
     },
     {
-        "numberQuestion": "17a",
-        "question": "Have you experienced pain caused by slight pressure on your skin (a finger pushing against you, for example) in the last 7 days?",
+        "numberQuestion": "questionire.18a.numberQuestion",
+        "question": "questionire.18a.question",
         "questionHighlight": [
             {
-                "text": "pain caused by slight pressure on your skin"
+                "text": "questionire.18a.questionHighlight.text",
+                "underline": ["questionire.18a.questionHighlight.underline"]
             }
         ],
         "isYesnoQuestion": true,
         "showSubQuestionOnYes": true,
         "subQuestions": [
             {
-                "numberQuestion": "17b",
-                "question": "Please select the number that best describes this pain at its worst in the last 7 days.",
+                "numberQuestion": "questionire.18b.numberQuestion",
+                "question": "questionire.18b.question",
                 "questionHighlight": [
                     {
-                        "text": "this pain at its worst"
+                        "text": "questionire.18b.questionHighlight.text"
                     }
                 ],
-                "labelLeft": "No pain",
-                "labelRight": "Extreme pain"
+                "labelLeft": "questionire.18b.labelLeft",
+                "labelRight": "questionire.18b.labelRight"
             }
         ]
     },
     {
-        "numberQuestion": "18a",
-        "question": "Have you recently experienced pain caused by a pointed object touching your skin (the point of a pencil, or the prongs of a fork for example) in the last 7 days?",
+        "numberQuestion": "questionire.19a.numberQuestion",
+        "question": "questionire.19a.question",
         "questionHighlight": [
             {
-                "text": "pain caused by a pointed object touching your skin",
-                "underline": ["touching"]
+                "text": "questionire.19a.questionHighlight.text",
+                "underline": ["questionire.19a.questionHighlight.underline"]
             }
         ],
         "isYesnoQuestion": true,
         "showSubQuestionOnYes": true,
         "subQuestions": [
             {
-                "numberQuestion": "18b",
-                "question": "Please select the number that best describes this pain at its worst in the last 7 days.",
+                "numberQuestion": "questionire.19b.numberQuestion",
+                "question": "questionire.19b.question",
                 "questionHighlight": [
                     {
-                        "text": "this pain at its worst"
+                        "text": "questionire.19b.questionHighlight.text"
                     }
                 ],
-                "labelLeft": "No pain",
-                "labelRight": "Extreme pain"
+                "labelLeft": "questionire.19b.labelLeft",
+                "labelRight": "questionire.19b.labelRight"
             }
         ]
     },
     {
-        "numberQuestion": "19a",
-        "question": "Have you experienced pain caused by coming into contact with something cold (cold water, or cold wind for example) in the last 7 days?",
+        "numberQuestion": "questionire.20a.numberQuestion",
+        "question": "questionire.20a.question",
         "questionHighlight": [
             {
-                "text": "pain caused by coming into contact with something cold",
-                "underline": ["contact with something cold"]
+                "text": "questionire.20a.questionHighlight.text",
+                "underline": ["questionire.20a.questionHighlight.underline"]
             }
         ],
         "isYesnoQuestion": true,
         "showSubQuestionOnYes": true,
         "subQuestions": [
             {
-                "numberQuestion": "19b",
-                "question": "Please select the number that best describes this pain at its worst in the last 7 days.",
+                "numberQuestion": "questionire.20b.numberQuestion",
+                "question": "questionire.20b.question",
                 "questionHighlight": [
                     {
-                        "text": "this pain at its worst"
+                        "text": "questionire.20b.questionHighlight.text"
                     }
                 ],
-                "labelLeft": "No pain",
-                "labelRight": "Extreme Pain"
-            }
-        ]
-    },
-    {
-        "numberQuestion": "20a",
-        "question": "Have you experienced pain caused by coming into contact with something warm (warm water, when showering for example) in the last 7 days?",
-        "questionHighlight": [
-            {
-                "text": "pain caused by coming into contact with something warm",
-                "underline": ["coming into contact with something warm"]
-            }
-        ],
-        "isYesnoQuestion": true,
-        "showSubQuestionOnYes": true,
-        "subQuestions": [
-            {
-                "numberQuestion": "20b",
-                "question": "Please select the number that best describes this pain at its worst in the last 7 days.",
-                "questionHighlight": [
-                    {
-                        "text": "this pain at its worst"
-                    }
-                ],
-                "labelLeft": "No pain",
-                "labelRight": "Extreme Pain"
+                "labelLeft": "questionire.20b.labelLeft",
+                "labelRight": "questionire.20b.labelRight"
             }
         ]
     }

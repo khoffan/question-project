@@ -2,13 +2,14 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:csv/csv.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:questionnaire/cubit/answer_cubit.dart';
 import 'package:questionnaire/model/answer_model.dart';
 import 'package:questionnaire/model/question_model.dart';
-import 'package:questionnaire/widget/body_grid_canvas_widget.dart';
 import 'package:questionnaire/widget/comment_box_widget.dart';
+import 'package:questionnaire/widget/custom_dropdown.dart';
 import 'package:questionnaire/widget/question_widget.dart';
 import 'package:universal_html/html.dart' as html;
 
@@ -43,7 +44,7 @@ class _ApplicationState extends State<Application> {
     _userName = userName ?? '';
     _patientId = patientId ?? userId ?? '';
     _patientName = patientName ?? userName ?? '';
-    print('Uri info: $_userId $_userName $_patientId $_patientName');
+    // print('Uri info: $_userId $_userName $_patientId $_patientName');
   }
 
   void _saveAnswer(String questionId, dynamic value, String? parentId) {
@@ -125,10 +126,7 @@ class _ApplicationState extends State<Application> {
     return sorted;
   }
 
-  void downloadJsonFIle(
-    String jsonString, [
-    String filename = "answer.json",
-  ]) async {
+  void downloadJsonFIle(String jsonString, String filename) async {
     final bytes = utf8.encode(jsonString);
     final blob = html.Blob([Uint8List.fromList(bytes)]);
     final url = html.Url.createObjectUrlFromBlob(blob);
@@ -152,12 +150,31 @@ class _ApplicationState extends State<Application> {
 
     final csvString = const ListToCsvConverter().convert([header, row]);
 
-    downloadJsonFIle(csvString, "answer.csv");
+    downloadJsonFIle(
+      csvString,
+      "answer_${_patientName}_${DateTime.now().millisecondsSinceEpoch}.csv",
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    context.locale;
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('PAINPREDICT'),
+        actions: [
+          CustomDropdown(
+            items: [
+              Items(value: "en", label: "English"),
+              Items(value: "th", label: "ไทย"),
+            ],
+            onChanged: (value) {
+              context.setLocale(Locale(value!));
+            },
+            initialValue: "en",
+          ),
+        ],
+      ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         controller: scrollController,
@@ -171,7 +188,7 @@ class _ApplicationState extends State<Application> {
                 child: Column(
                   children: [
                     Text(
-                      'PAIN QUESTIONNAIRE',
+                      'questionire.title'.tr(),
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -187,8 +204,8 @@ class _ApplicationState extends State<Application> {
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.black, width: 2),
                       ),
-                      child: const Text(
-                        "You have been told by your doctor that you have a type of pain called \"Neuropathic pain\". This questionnaireasks you about this neuropathic pain and related unpleasant sensations (for example, tingling or numbness).Please make sure you think only about this pain and these types of sensations when you answer thesequestions, and not about any other pain or sensations you might feel.",
+                      child: Text(
+                        "questionire.subtitle".tr(),
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
@@ -198,39 +215,11 @@ class _ApplicationState extends State<Application> {
                     const SizedBox(height: 16),
                     SizedBox(
                       child: Text(
-                        "Please answer the questions below by clearly marking an ‘x’ in the box ( ) that best describes your experience withneuropathic pain, thinking about the last 7 days, including today. Please make sure you answer each question.",
+                        "questionire.detail".tr(),
                         style: TextStyle(fontSize: 16),
                       ),
                     ),
-                    const SizedBox(height: 18),
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        if (constraints.maxWidth <= 680) {
-                          return Column(
-                            children: [
-                              BodyGridCanvasWidget(
-                                imagePath: 'assets/images/body_front.png',
-                              ),
-                              const SizedBox(height: 10),
-                              BodyGridCanvasWidget(
-                                imagePath: 'assets/images/body_back.png',
-                              ),
-                            ],
-                          );
-                        }
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            BodyGridCanvasWidget(
-                              imagePath: 'assets/images/body_front.png',
-                            ),
-                            BodyGridCanvasWidget(
-                              imagePath: 'assets/images/body_back.png',
-                            ),
-                          ],
-                        );
-                      },
-                    ),
+
                     const SizedBox(height: 18),
                     ...questionList.map((question) {
                       return QuestionWidget(
@@ -254,9 +243,14 @@ class _ApplicationState extends State<Application> {
                                     answers,
                                   );
                                   final json = exportAnswer2Json(sortedAnswers);
-                                  downloadJsonFIle(json);
+                                  downloadJsonFIle(
+                                    json,
+                                    "answer_${_patientName}_${DateTime.now().millisecondsSinceEpoch}.json",
+                                  );
                                 },
-                                child: Text('Export json file'),
+                                child: Text(
+                                  'questionire.button.export_json'.tr(),
+                                ),
                               ),
                               const SizedBox(height: 10),
                               ElevatedButton(
@@ -268,7 +262,9 @@ class _ApplicationState extends State<Application> {
                                   );
                                   exportJson2Csv(answers: sortedAnswers);
                                 },
-                                child: Text('Export csv file'),
+                                child: Text(
+                                  'questionire.button.export_csv'.tr(),
+                                ),
                               ),
                             ],
                           );
@@ -282,9 +278,14 @@ class _ApplicationState extends State<Application> {
                                     context.read<AnswerCubit>().state;
                                 final sortedAnswers = sortedAnswerList(answers);
                                 final json = exportAnswer2Json(sortedAnswers);
-                                downloadJsonFIle(json);
+                                downloadJsonFIle(
+                                  json,
+                                  "answer_${_patientName}_${DateTime.now().millisecondsSinceEpoch}.json",
+                                );
                               },
-                              child: Text('Export json file'),
+                              child: Text(
+                                'questionire.button.export_json'.tr(),
+                              ),
                             ),
                             ElevatedButton(
                               onPressed: () {
@@ -293,7 +294,7 @@ class _ApplicationState extends State<Application> {
                                 final sortedAnswers = sortedAnswerList(answers);
                                 exportJson2Csv(answers: sortedAnswers);
                               },
-                              child: Text('Export csv file'),
+                              child: Text('questionire.button.export_csv'.tr()),
                             ),
                           ],
                         );
