@@ -10,9 +10,13 @@ import 'package:questionnaire/cubit/answer_cubit.dart';
 import 'package:questionnaire/cubit/form_cubit.dart';
 import 'package:questionnaire/datasource/form_datasource.dart';
 import 'package:questionnaire/model/question_model.dart';
+import 'package:questionnaire/singleton/shared_pref_instance.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await SharedPrefInstance.init();
 
   // Future<List<Question>> loadQuestions() async {
   //   final jsonString = await rootBundle.loadString(
@@ -27,7 +31,11 @@ void main() async {
   //   }
   // }
 
-  final form = await FormDataSourceImpl().getFormQuestions() ?? [];
+  final form =
+      await FormDataSourceImpl(
+        sharedPreferences: SharedPrefInstance.instance,
+      ).getFormQuestions() ??
+      [];
   if (kIsWeb) {
     usePathUrlStrategy();
   }
@@ -46,7 +54,14 @@ class MyApp extends StatelessWidget {
       home: MultiBlocProvider(
         providers: [
           BlocProvider(create: (context) => AnswerCubit()),
-          BlocProvider(create: (context) => FormCubit(FormDataSourceImpl())),
+          BlocProvider(
+            create:
+                (context) => FormCubit(
+                  FormDataSourceImpl(
+                    sharedPreferences: SharedPrefInstance.instance,
+                  ),
+                ),
+          ),
         ],
         child: Application(questions: questions),
       ),
