@@ -85,9 +85,9 @@ class _LavelPainWidgetState extends State<LavelPainWidget> {
 
   double calculateSidePadding(double maxWidth) {
     const double baseWidth = 1188;
-    const double stepWidth = 200; // ทุก ๆ 200px ลดลงทีละ 10
-    const double startPadding = 55;
-    const double minPadding = 20;
+    const double stepWidth = 100; // ทุก ๆ 200px ลดลงทีละ 10
+    const double startPadding = 60;
+    const double minPadding = 5;
 
     // คำนวณจำนวนช่วงที่ลดลง
     final double diff = baseWidth - maxWidth;

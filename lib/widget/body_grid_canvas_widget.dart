@@ -1,8 +1,8 @@
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:questionnaire/model/answer_model.dart';
 
 class BodyLabel {
   final String text;
@@ -12,31 +12,40 @@ class BodyLabel {
 }
 
 class BodyGridCanvasWidget extends StatefulWidget {
-  const BodyGridCanvasWidget({super.key, required this.imagePath});
+  const BodyGridCanvasWidget({
+    super.key,
+    required this.imagePath,
+    required this.questionId,
+    required this.label,
+    required this.onTap,
+  });
   final String imagePath;
+  final String questionId;
+  final String label;
+  final Function(Map<String, List<TapPointEntity>>) onTap;
 
   @override
   State<BodyGridCanvasWidget> createState() => _BodyGridCanvasWidgetState();
 }
 
 class _BodyGridCanvasWidgetState extends State<BodyGridCanvasWidget> {
-  final List<Offset> circlePoints = [];
+  final Map<String, List<TapPointEntity>> circlePointMap = {};
   ui.Image? bodyImage;
   ByteData? imagePixels;
 
   final double canvasWidth = 300;
   final double canvasHeight = 580;
-  final List<BodyLabel> bodyLabels = [
-    BodyLabel(text: 'หัว', position: Offset(130, 20)),
-    BodyLabel(text: 'คอ', position: Offset(135, 70)),
-    BodyLabel(text: 'ไหล่', position: Offset(50, 80)),
-    BodyLabel(text: 'แขน', position: Offset(30, 150)),
-    BodyLabel(text: 'ศอก', position: Offset(25, 200)),
-    BodyLabel(text: 'หน้าอก', position: Offset(110, 120)),
-    BodyLabel(text: 'น่อง', position: Offset(130, 300)),
-    BodyLabel(text: 'ขา', position: Offset(130, 350)),
-    BodyLabel(text: 'เท้า', position: Offset(130, 420)),
-  ];
+  // final List<BodyLabel> bodyLabels = [
+  //   BodyLabel(text: 'หัว', position: Offset(130, 20)),
+  //   BodyLabel(text: 'คอ', position: Offset(135, 70)),
+  //   BodyLabel(text: 'ไหล่', position: Offset(50, 80)),
+  //   BodyLabel(text: 'แขน', position: Offset(30, 150)),
+  //   BodyLabel(text: 'ศอก', position: Offset(25, 200)),
+  //   BodyLabel(text: 'หน้าอก', position: Offset(110, 120)),
+  //   BodyLabel(text: 'น่อง', position: Offset(130, 300)),
+  //   BodyLabel(text: 'ขา', position: Offset(130, 350)),
+  //   BodyLabel(text: 'เท้า', position: Offset(130, 420)),
+  // ];
 
   @override
   void initState() {
@@ -60,7 +69,7 @@ class _BodyGridCanvasWidgetState extends State<BodyGridCanvasWidget> {
     });
   }
 
-  void _handleTapDown(TapDownDetails details) {
+  void _handleTapDown(TapDownDetails details, String label) {
     if (bodyImage == null || imagePixels == null) return;
 
     final local = details.localPosition;
@@ -90,16 +99,28 @@ class _BodyGridCanvasWidgetState extends State<BodyGridCanvasWidget> {
 
     if (isTransparent) {
       setState(() {
-        circlePoints.add(local);
+        circlePointMap
+            .putIfAbsent(label, () => [])
+            .add(TapPointEntity.fromOffset(local));
       });
+      widget.onTap(circlePointMap);
     }
   }
 
   void _clearPoints() {
     setState(() {
-      circlePoints.clear();
+      circlePointMap.remove(widget.label);
     });
   }
+
+  // void _savePoints() {
+  //   print("tap map: ${circlePointMap}");
+  //   context.read<AnswerCubit>().saveAnswer(
+  //     questionId: widget.questionId,
+  //     value: "",
+  //     tapPoints: circlePointMap,
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -108,20 +129,35 @@ class _BodyGridCanvasWidgetState extends State<BodyGridCanvasWidget> {
       child: Column(
         children: [
           GestureDetector(
-            onTapDown: _handleTapDown,
+            onTapDown: (details) => _handleTapDown(details, widget.label),
             child: CustomPaint(
               size: Size(canvasWidth, canvasHeight),
               painter: BodyGridPainter(
                 bodyImage: bodyImage,
-                points: circlePoints,
+                points: circlePointMap[widget.label] ?? [],
                 canvasSize: Size(canvasWidth, canvasHeight),
-                labels: bodyLabels,
+                // labels: bodyLabels,
               ),
             ),
           ),
-          ElevatedButton(
-            onPressed: circlePoints.isNotEmpty ? _clearPoints : null,
-            child: Text('questionire.button.clear'.tr()),
+          Row(
+            children: [
+              ElevatedButton(
+                onPressed:
+                    circlePointMap[widget.label]?.isNotEmpty ?? false
+                        ? _clearPoints
+                        : null,
+                child: Text('questionire.button.clear'.tr()),
+              ),
+              const SizedBox(width: 20),
+              // ElevatedButton(
+              //   onPressed:
+              //       circlePointMap[widget.label]?.isNotEmpty ?? false
+              //           ? _savePoints
+              //           : null,
+              //   child: Text('questionire.button.save'.tr()),
+              // ),
+            ],
           ),
         ],
       ),
@@ -131,15 +167,15 @@ class _BodyGridCanvasWidgetState extends State<BodyGridCanvasWidget> {
 
 class BodyGridPainter extends CustomPainter {
   final ui.Image? bodyImage;
-  final List<Offset> points;
+  final List<TapPointEntity> points;
   final Size canvasSize;
-  final List<BodyLabel> labels;
+  final List<BodyLabel>? labels;
 
   BodyGridPainter({
     required this.bodyImage,
     required this.points,
     required this.canvasSize,
-    required this.labels,
+    this.labels,
   });
 
   @override
@@ -168,30 +204,32 @@ class BodyGridPainter extends CustomPainter {
       );
     }
 
-    for (final label in labels) {
-      final textSpan = TextSpan(
-        text: label.text,
-        style: TextStyle(
-          color: Colors.blue,
-          fontSize: 14,
-          fontWeight: FontWeight.bold,
-          backgroundColor: Colors.white.withOpacity(0.5),
-        ),
-      );
+    if (labels != null && labels!.isNotEmpty) {
+      for (final label in labels!) {
+        final textSpan = TextSpan(
+          text: label.text,
+          style: TextStyle(
+            color: Colors.blue,
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            backgroundColor: Colors.white.withValues(alpha: 0.5),
+          ),
+        );
 
-      final textPainter = TextPainter(
-        text: textSpan,
-        textDirection: ui.TextDirection.ltr,
-      );
+        final textPainter = TextPainter(
+          text: textSpan,
+          textDirection: ui.TextDirection.ltr,
+        );
 
-      textPainter.layout();
-      textPainter.paint(canvas, label.position);
+        textPainter.layout();
+        textPainter.paint(canvas, label.position);
+      }
     }
 
     // Draw points
     final Paint circlePaint = Paint()..color = Colors.red;
     for (final point in points) {
-      canvas.drawCircle(point, 8, circlePaint);
+      canvas.drawCircle(point.toOffset(), 8, circlePaint);
     }
   }
 

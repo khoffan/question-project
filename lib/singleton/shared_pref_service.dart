@@ -1,19 +1,22 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SharedPrefService {
-  late final SharedPreferences _instance;
+class SharedPrefsService {
+  static SharedPreferences? _preferences;
+  // Private constructor to prevent instantiation
+  SharedPrefsService._();
 
-  Future<void> init() async {
-    _instance = await SharedPreferences.getInstance();
+  /// Initialize SharedPreferences (Call this in `main.dart` before runApp)
+  static Future<void> init() async {
+    _preferences = await SharedPreferences.getInstance();
   }
 
-  SharedPreferences get instance => _instance;
-
-  Future<void> saveString(String key, String value) async {
-    await _instance.setString(key, value);
-  }
-
-  Future<String?> getString(String key) async {
-    return _instance.getString(key);
+  /// Get the instance of SharedPreferences
+  static SharedPreferences get instance {
+    if (_preferences == null) {
+      throw Exception(
+        "SharedPreferences not initialized. Call SharedPrefsService.init() first.",
+      );
+    }
+    return _preferences!;
   }
 }

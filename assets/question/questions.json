@@ -137,8 +137,8 @@
                                 "text": "questionire.7d.questionHighlight.text"
                             }
                         ],
-                        "labelLeft": "No pain",
-                        "labelRight": "Extreme pain"
+                        "labelLeft": "questionire.7d.labelLeft",
+                        "labelRight": "questionire.7d.labelRight"
                     }
                 ]
             }

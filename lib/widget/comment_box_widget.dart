@@ -49,12 +49,6 @@ class _CommentBoxWidgetState extends State<CommentBoxWidget> {
               ),
               onFieldSubmitted: widget.onComment,
               controller: _controller,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return "Please enter your comments";
-                }
-                return null;
-              },
             ),
           ),
         ),

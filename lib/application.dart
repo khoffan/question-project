@@ -48,18 +48,32 @@ class _ApplicationState extends State<Application> {
   }
 
   void _saveAnswer(String questionId, dynamic value, String? parentId) {
-    context.read<AnswerCubit>().saveAnswer(
-      questionId: questionId,
-      value: value.toString(),
-      parentId: parentId,
-    );
+    final cubit = context.read<AnswerCubit>();
+
+    if (value is Map<String, List<TapPointEntity>>) {
+      cubit.saveAnswer(
+        questionId: questionId,
+        value: "",
+        tapPoints: value,
+        parentId: parentId,
+      );
+    } else {
+      cubit.saveAnswer(
+        questionId: questionId,
+        value: value.toString(),
+        parentId: parentId,
+      );
+    }
+    cubit.saveLocal(questionId.tr(), value);
   }
 
   void _saveComment(String comment) {
+    print(comment);
     context.read<AnswerCubit>().saveAnswer(
       questionId: 'comment',
       value: comment.toString(),
     );
+    context.read<AnswerCubit>().saveLocal('comment', comment);
   }
 
   String exportAnswer2Json(List<AnswerModel> ans) {
@@ -74,12 +88,16 @@ class _ApplicationState extends State<Application> {
     return JsonEncoder.withIndent("  ").convert(result);
   }
 
-  Map<String, String> flattrenAnswerList(List<AnswerModel> list) {
-    final Map<String, String> map = {};
+  Map<String, dynamic> flattrenAnswerList(List<AnswerModel> list) {
+    final Map<String, dynamic> map = {};
 
     void walk(List<AnswerModel> answers) {
       for (final ans in answers) {
-        map[ans.numberQuestion] = ans.answer;
+        if (ans.answer != "") {
+          map[ans.numberQuestion] = ans.answer;
+        } else {
+          map[ans.numberQuestion] = ans.tapPoints;
+        }
         if (ans.subAnswers.isNotEmpty) {
           walk(ans.subAnswers);
         }
@@ -146,14 +164,31 @@ class _ApplicationState extends State<Application> {
 
     final header = ['patianId', 'patianName', ...ansMap.keys, "date"];
 
-    final row = ["user123", "John Doe", ...ansMap.values, dateStr];
+    final row = [
+      _patientId,
+      _patientName,
+      ...ansMap.entries.map((entry) {
+        final value = entry.value;
+
+        // ถ้า value เป็นค่าว่าง และมี tapPoints ให้ใช้แทน
+        if (value is String && value.isNotEmpty) {
+          return value;
+        }
+
+        if (value is Map<String, List<TapPointEntity>> && value.isNotEmpty) {
+          return value.map(
+            (key, value) => MapEntry(key, value.map((e) => e.toMap()).toList()),
+          );
+        }
+
+        return "";
+      }),
+      dateStr,
+    ];
 
     final csvString = const ListToCsvConverter().convert([header, row]);
 
-    downloadJsonFIle(
-      csvString,
-      "answer_${_patientName}_${DateTime.now().millisecondsSinceEpoch}.csv",
-    );
+    downloadJsonFIle(csvString, "answer_${_patientName}_${DateTime.now()}.csv");
   }
 
   @override
@@ -273,15 +308,22 @@ class _ApplicationState extends State<Application> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             ElevatedButton(
-                              onPressed: () {
+                              onPressed: () async {
                                 final answers =
                                     context.read<AnswerCubit>().state;
                                 final sortedAnswers = sortedAnswerList(answers);
                                 final json = exportAnswer2Json(sortedAnswers);
+                                context.read<AnswerCubit>().saveAllAnswerLocal(
+                                  patientId: _patientId,
+                                  answers: sortedAnswers,
+                                );
                                 downloadJsonFIle(
                                   json,
                                   "answer_${_patientName}_${DateTime.now().millisecondsSinceEpoch}.json",
                                 );
+                                context
+                                    .read<AnswerCubit>()
+                                    .clearAllAnswerLocal();
                               },
                               child: Text(
                                 'questionire.button.export_json'.tr(),
@@ -292,7 +334,14 @@ class _ApplicationState extends State<Application> {
                                 final answers =
                                     context.read<AnswerCubit>().state;
                                 final sortedAnswers = sortedAnswerList(answers);
+                                context.read<AnswerCubit>().saveAllAnswerLocal(
+                                  patientId: _patientId,
+                                  answers: sortedAnswers,
+                                );
                                 exportJson2Csv(answers: sortedAnswers);
+                                context
+                                    .read<AnswerCubit>()
+                                    .clearAllAnswerLocal();
                               },
                               child: Text('questionire.button.export_csv'.tr()),
                             ),

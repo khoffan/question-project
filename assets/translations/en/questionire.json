@@ -404,6 +404,7 @@
         },
         "button": {
             "clear": "Clear",
+            "save": "Save",
             "submit": "Submit",
             "export_json": "Export JSON file",
             "export_csv": "Export CSV file"

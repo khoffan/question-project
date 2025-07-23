@@ -1,21 +1,29 @@
 import 'dart:convert';
+import 'dart:ui';
 import 'package:equatable/equatable.dart';
 
 class AnswerModel extends Equatable {
   final String numberQuestion;
   final String answer;
+  final Map<String, List<TapPointEntity>>? tapPoints;
   final List<AnswerModel> subAnswers;
 
   const AnswerModel({
     required this.numberQuestion,
     required this.answer,
+    this.tapPoints,
     required this.subAnswers,
   });
 
-  AnswerModel copyWith({String? answer, List<AnswerModel>? subAnswers}) {
+  AnswerModel copyWith({
+    String? answer,
+    List<AnswerModel>? subAnswers,
+    Map<String, List<TapPointEntity>>? tapPoints,
+  }) {
     return AnswerModel(
       numberQuestion: numberQuestion,
       answer: answer ?? this.answer,
+      tapPoints: tapPoints ?? this.tapPoints,
       subAnswers: subAnswers ?? this.subAnswers,
     );
   }
@@ -24,6 +32,17 @@ class AnswerModel extends Equatable {
     return AnswerModel(
       numberQuestion: json['number_question'] ?? "",
       answer: json['answer'] ?? "",
+      tapPoints:
+          json['tap_points'] != null
+              ? (json['tap_points'] as Map<String, dynamic>).map(
+                (key, value) => MapEntry(
+                  key,
+                  (value as List<dynamic>)
+                      .map((e) => TapPointEntity.fromMap(e))
+                      .toList(),
+                ),
+              )
+              : null,
       subAnswers:
           json['sub_answers'] != null
               ? List<AnswerModel>.from(json['sub_answers'])
@@ -34,7 +53,13 @@ class AnswerModel extends Equatable {
   Map<String, dynamic> toJson() {
     return {
       'number_question': numberQuestion,
-      'answer': jsonDecodeIfNeeded(answer),
+      'answer':
+          tapPoints != null
+              ? tapPoints!.map(
+                (key, value) =>
+                    MapEntry(key, value.map((e) => e.toMap()).toList()),
+              )
+              : answer,
       if (subAnswers.isNotEmpty)
         'sub_answers': subAnswers.map((e) => e.toJson()).toList(),
     };
@@ -50,11 +75,11 @@ class AnswerModel extends Equatable {
 
   @override
   String toString() {
-    return 'AnswerModel(number_question: $numberQuestion, answer: $answer, subAnswers: $subAnswers)';
+    return 'AnswerModel(number_question: $numberQuestion, answer: $answer, tapPoints: $tapPoints, subAnswers: $subAnswers)';
   }
 
   @override
-  List<Object?> get props => [numberQuestion, answer, subAnswers];
+  List<Object?> get props => [numberQuestion, answer, tapPoints, subAnswers];
 }
 
 class FormAnswerModel extends Equatable {
@@ -113,4 +138,30 @@ class FormAnswerModel extends Equatable {
 
   @override
   List<Object?> get props => [formId, userid, patientId, patienName, answers];
+}
+
+class TapPointEntity {
+  final double x;
+  final double y;
+
+  TapPointEntity({required this.x, required this.y});
+
+  factory TapPointEntity.fromOffset(Offset offset) {
+    return TapPointEntity(x: offset.dx, y: offset.dy);
+  }
+
+  Offset toOffset() => Offset(x, y);
+
+  Map<String, dynamic> toMap() => {
+    'x': x.toStringAsFixed(3),
+    'y': y.toStringAsFixed(3),
+  };
+
+  factory TapPointEntity.fromMap(Map<String, dynamic> map) =>
+      TapPointEntity(x: double.parse(map['x']), y: double.parse(map['y']));
+
+  @override
+  toString() {
+    return 'TapPointEntity(x: $x, y: $y)';
+  }
 }
