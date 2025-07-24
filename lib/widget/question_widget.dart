@@ -11,8 +11,14 @@ import 'package:questionnaire/widget/yes_no_question_widget.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class QuestionWidget extends StatefulWidget {
-  const QuestionWidget({super.key, required this.question, this.onAnswer});
+  const QuestionWidget({
+    super.key,
+    required this.question,
+    this.onAnswer,
+    required this.isSubmit,
+  });
   final Question question;
+  final bool isSubmit;
   final Function(String questionId, dynamic value, String? parentId)? onAnswer;
 
   @override
@@ -23,6 +29,28 @@ class _QuestionWidgetState extends State<QuestionWidget> {
   Map<String, int?> selectedPainValueMap = {};
   Map<String, int> selectedYesNoValue = {};
   Map<String, List<TapPointEntity>> allPoints = {"front": [], "back": []};
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      if (mounted) {
+        context.read<AnswerCubit>().restoreAnswersFromLocal();
+      }
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant QuestionWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isSubmit != widget.isSubmit) {
+      Future.microtask(() {
+        if (mounted) {
+          context.read<AnswerCubit>().restoreAnswersFromLocal();
+        }
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -137,6 +165,11 @@ class _QuestionWidgetState extends State<QuestionWidget> {
                       }
                     });
                   });
+                  widget.onAnswer?.call(
+                    question.numberQuestion.tr(),
+                    allPoints,
+                    null,
+                  );
                 },
               ),
               const SizedBox(height: 10),
@@ -154,18 +187,14 @@ class _QuestionWidgetState extends State<QuestionWidget> {
                       }
                     });
                   });
+                  widget.onAnswer?.call(
+                    question.numberQuestion.tr(),
+                    allPoints,
+                    null,
+                  );
                 },
               ),
               const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed:
-                    () => widget.onAnswer?.call(
-                      question.numberQuestion.tr(),
-                      allPoints,
-                      null,
-                    ),
-                child: const Text("Save"),
-              ),
             ],
           );
         }
@@ -198,6 +227,11 @@ class _QuestionWidgetState extends State<QuestionWidget> {
                         }
                       });
                     });
+                    widget.onAnswer?.call(
+                      question.numberQuestion.tr(),
+                      allPoints,
+                      null,
+                    );
                   },
                 ),
                 BodyGridCanvasWidget(
@@ -214,20 +248,16 @@ class _QuestionWidgetState extends State<QuestionWidget> {
                         }
                       });
                     });
+                    widget.onAnswer?.call(
+                      question.numberQuestion.tr(),
+                      allPoints,
+                      null,
+                    );
                   },
                 ),
               ],
             ),
             const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed:
-                  () => widget.onAnswer?.call(
-                    question.numberQuestion.tr(),
-                    allPoints,
-                    null,
-                  ),
-              child: const Text("Save"),
-            ),
           ],
         );
       },
