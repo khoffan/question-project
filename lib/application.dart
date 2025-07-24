@@ -34,6 +34,10 @@ class _ApplicationState extends State<Application> {
   void initState() {
     super.initState();
 
+    Future.microtask(() {
+      context.read<AnswerCubit>().restoreAnswersFromLocal();
+    });
+
     questionList = widget.questions;
     final queryParams = Uri.base.queryParameters;
     final String? userId = queryParams['id'];
@@ -68,7 +72,7 @@ class _ApplicationState extends State<Application> {
   }
 
   void _saveComment(String comment) {
-    print(comment);
+    // print(comment);
     context.read<AnswerCubit>().saveAnswer(
       questionId: 'comment',
       value: comment.toString(),
@@ -342,6 +346,8 @@ class _ApplicationState extends State<Application> {
                                 context
                                     .read<AnswerCubit>()
                                     .clearAllAnswerLocal();
+
+                                setState(() {});
                               },
                               child: Text('questionire.button.export_csv'.tr()),
                             ),

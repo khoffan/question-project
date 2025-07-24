@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:questionnaire/cubit/answer_cubit.dart';
+import 'package:questionnaire/datasource/form_local_datasouce.dart';
 import 'package:questionnaire/model/answer_model.dart';
 import 'package:questionnaire/model/question_model.dart';
 import 'package:questionnaire/widget/body_grid_canvas_widget.dart';
@@ -26,49 +27,87 @@ class _QuestionWidgetState extends State<QuestionWidget> {
   @override
   Widget build(BuildContext context) {
     context.locale;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (widget.question.isYesnoQuestion) ...[
-          _buildYesNoQuestion(widget.question, null),
-          const SizedBox(height: 40),
-          if (selectedYesNoValue[widget.question.numberQuestion] == 2 &&
-              widget.question.showSubQuestionOnYes) ...[
-            if (widget.question.subQuestions.isNotEmpty) ...[
-              for (var question in widget.question.subQuestions) ...[
-                if (question.isYesnoQuestion) ...[
-                  _buildYesNoQuestion(question, widget.question.numberQuestion),
-                  const SizedBox(height: 40),
-                  if (question.showSubQuestionOnYes &&
-                      selectedYesNoValue[question.numberQuestion] == 2 &&
-                      question.subQuestions.isNotEmpty) ...[
-                    for (var subQuestion in question.subQuestions) ...[
-                      _buildLavelChoice(subQuestion, question.numberQuestion),
-                      const SizedBox(height: 40),
+    return FutureBuilder<Map<String, dynamic>>(
+      future: context.read<AnswerCubit>().getAll(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done &&
+            snapshot.hasData) {
+          final data = snapshot.data;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (widget.question.isYesnoQuestion) ...[
+                _buildYesNoQuestion(
+                  context,
+                  question: widget.question,
+                  valueLocal: data?[widget.question.numberQuestion.tr()],
+                ),
+                const SizedBox(height: 40),
+                if (selectedYesNoValue[widget.question.numberQuestion] == 2 &&
+                    widget.question.showSubQuestionOnYes) ...[
+                  if (widget.question.subQuestions.isNotEmpty) ...[
+                    for (var question in widget.question.subQuestions) ...[
+                      if (question.isYesnoQuestion) ...[
+                        _buildYesNoQuestion(
+                          context,
+                          question: question,
+                          valueLocal: data?[question.numberQuestion.tr()],
+                          parentId: widget.question.numberQuestion,
+                        ),
+                        const SizedBox(height: 40),
+                        if (question.showSubQuestionOnYes &&
+                            selectedYesNoValue[question.numberQuestion] == 2 &&
+                            question.subQuestions.isNotEmpty) ...[
+                          for (var subQuestion in question.subQuestions) ...[
+                            _buildLavelChoice(
+                              context,
+                              question: subQuestion,
+                              valueLocal:
+                                  data?[subQuestion.numberQuestion.tr()],
+                              parentId: question.numberQuestion,
+                            ),
+                            const SizedBox(height: 40),
+                          ],
+                        ],
+                      ] else ...[
+                        _buildLavelChoice(
+                          context,
+                          question: question,
+                          valueLocal: data?[question.numberQuestion.tr()],
+                          parentId: widget.question.numberQuestion,
+                        ),
+                        const SizedBox(height: 40),
+                      ],
                     ],
-                  ],
-                ] else ...[
-                  _buildLavelChoice(question, widget.question.numberQuestion),
-                  const SizedBox(height: 40),
+                  ] else
+                    const SizedBox(height: 40),
                 ],
+              ] else if (widget.question.useBodyGrid) ...[
+                _bodyGrid(context, widget.question),
+                const SizedBox(height: 40),
+              ] else if (widget.question.useChoice) ...[
+                _buildChoiceQuestion(
+                  context,
+                  question: widget.question,
+                  valueLocal: data?[widget.question.numberQuestion.tr()],
+                ),
+                const SizedBox(height: 40),
+              ] else ...[
+                _buildLavelChoice(
+                  context,
+                  question: widget.question,
+                  valueLocal: data?[widget.question.numberQuestion.tr()],
+                ),
               ],
-            ] else
-              const SizedBox(height: 40),
-          ],
-        ] else if (widget.question.useBodyGrid) ...[
-          _bodyGrid(widget.question),
-          const SizedBox(height: 40),
-        ] else if (widget.question.useChoice) ...[
-          _buildChoiceQuestion(widget.question),
-          const SizedBox(height: 40),
-        ] else ...[
-          _buildLavelChoice(widget.question, null),
-        ],
-      ],
+            ],
+          );
+        }
+        return const CircularProgressIndicator();
+      },
     );
   }
 
-  Widget _bodyGrid(Question question) {
+  Widget _bodyGrid(BuildContext context, Question question) {
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth <= 680) {
@@ -89,7 +128,6 @@ class _QuestionWidgetState extends State<QuestionWidget> {
                 questionId: question.numberQuestion.tr(),
                 label: "front",
                 onTap: (value) {
-                  print("parent value front = ${value}");
                   setState(() {
                     value.forEach((key, newPoints) {
                       if (allPoints.containsKey(key)) {
@@ -107,7 +145,6 @@ class _QuestionWidgetState extends State<QuestionWidget> {
                 questionId: question.numberQuestion.tr(),
                 label: "back",
                 onTap: (value) {
-                  print("parent value back = ${value}");
                   setState(() {
                     value.forEach((key, newPoints) {
                       if (allPoints.containsKey(key)) {
@@ -197,176 +234,131 @@ class _QuestionWidgetState extends State<QuestionWidget> {
     );
   }
 
-  Widget _buildChoiceQuestion(Question question) {
-    return FutureBuilder<dynamic>(
-      future: context.read<AnswerCubit>().getAnswerLocal(
-        question.numberQuestion.tr(),
-      ),
-      builder: (context, snapshot) {
-        int choiceValue = 0;
-        if (snapshot.connectionState == ConnectionState.done &&
-            snapshot.hasData) {
-          final answer = snapshot.data;
-          if (answer != null && answer is String) {
-            choiceValue = int.parse(answer);
-
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              setState(() {
-                selectedPainValueMap[question.numberQuestion] = choiceValue;
-              });
+  Widget _buildChoiceQuestion(
+    BuildContext context, {
+    required Question question,
+    int? valueLocal,
+  }) {
+    if (!selectedPainValueMap.containsKey(question.numberQuestion)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          selectedPainValueMap[question.numberQuestion] = valueLocal;
+        });
+      });
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        RichText(
+          text: TextSpan(
+            style: TextStyle(fontSize: 16),
+            children: _buildHightlightText(
+              question,
+              question.questionHighlight,
+            ),
+          ),
+        ),
+        const SizedBox(height: 40),
+        ChoiceAnswerWidget(
+          initialAnswerValue:
+              valueLocal ?? selectedPainValueMap[question.numberQuestion],
+          onAnswer: (int? value) {
+            setState(() {
+              selectedPainValueMap[question.numberQuestion] = value;
             });
-          }
-        } else {
-          choiceValue = selectedPainValueMap[question.numberQuestion] ?? 0;
-        }
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            RichText(
-              text: TextSpan(
-                style: TextStyle(fontSize: 16),
-                children: _buildHightlightText(
-                  question,
-                  question.questionHighlight,
-                ),
-              ),
-            ),
-            const SizedBox(height: 40),
-            ChoiceAnswerWidget(
-              initialAnswerValue: choiceValue,
-              onAnswer: (int? value) {
-                setState(() {
-                  selectedPainValueMap[question.numberQuestion] = value;
-                });
-                final painValue = selectedPainValueMap[question.numberQuestion];
-                widget.onAnswer?.call(question.numberQuestion, painValue, null);
-              },
-            ),
-          ],
-        );
-      },
+            final painValue = selectedPainValueMap[question.numberQuestion];
+            widget.onAnswer?.call(question.numberQuestion, painValue, null);
+          },
+        ),
+      ],
     );
   }
 
-  Widget _buildYesNoQuestion(Question question, String? parentId) {
-    return FutureBuilder<dynamic>(
-      future: context.read<AnswerCubit>().getAnswerLocal(
-        question.numberQuestion.tr(),
-      ),
-      builder: (context, snapshot) {
-        int yesNoValue = 0;
-        if (snapshot.connectionState == ConnectionState.done &&
-            snapshot.hasData) {
-          final answer = snapshot.data;
-          if (answer != null && answer is String) {
-            yesNoValue = answer == "no" ? 1 : 2;
-            // 👇 ป้องกันการ setState ซ้ำซ้อน
-            if (!selectedYesNoValue.containsKey(question.numberQuestion)) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                setState(() {
-                  selectedYesNoValue[question.numberQuestion] = yesNoValue;
-                });
-              });
-            }
-          }
-        } else {
-          yesNoValue = selectedYesNoValue[question.numberQuestion] ?? 0;
-        }
+  Widget _buildYesNoQuestion(
+    BuildContext context, {
+    required Question question,
+    String? parentId,
+    String? valueLocal,
+  }) {
+    if (!selectedYesNoValue.containsKey(question.numberQuestion)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          selectedYesNoValue[question.numberQuestion] =
+              valueLocal == "yes"
+                  ? 2
+                  : valueLocal == "no"
+                  ? 1
+                  : 0;
+        });
+      });
+    }
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            RichText(
-              text: TextSpan(
-                style: TextStyle(fontSize: 16),
-                children: _buildHightlightText(
-                  question,
-                  question.questionHighlight,
-                ),
-              ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        RichText(
+          text: TextSpan(
+            style: TextStyle(fontSize: 16),
+            children: _buildHightlightText(
+              question,
+              question.questionHighlight,
             ),
-            const SizedBox(height: 20),
-            YesNoQuestionWidget(
-              initialYesNoValue: yesNoValue,
-              onYesNoSelected: (value) {
-                setState(() {
-                  selectedYesNoValue[question.numberQuestion] = value!;
-                });
-                final answer =
-                    selectedYesNoValue[question.numberQuestion] == 1
-                        ? "no"
-                        : "yes";
-                widget.onAnswer?.call(
-                  question.numberQuestion,
-                  answer,
-                  parentId,
-                );
-              },
-            ),
-          ],
-        );
-      },
+          ),
+        ),
+        const SizedBox(height: 20),
+        YesNoQuestionWidget(
+          initialYesNoValue:
+              valueLocal == "yes"
+                  ? 2
+                  : valueLocal == "no"
+                  ? 1
+                  : selectedYesNoValue[question.numberQuestion],
+          onYesNoSelected: (value) {
+            setState(() {
+              selectedYesNoValue[question.numberQuestion] = value!;
+            });
+            final answer =
+                selectedYesNoValue[question.numberQuestion] == 1 ? "no" : "yes";
+            widget.onAnswer?.call(question.numberQuestion, answer, parentId);
+          },
+        ),
+      ],
     );
   }
 
-  Widget _buildLavelChoice(Question question, String? parentId) {
-    return FutureBuilder<dynamic>(
-      future: context.read<AnswerCubit>().getAnswerLocal(
-        question.numberQuestion.tr(),
-      ),
-      builder: (context, snapshot) {
-        int painValue = 0;
-        if (snapshot.connectionState == ConnectionState.done &&
-            snapshot.hasData) {
-          final answer = snapshot.data;
-          if (answer != null && answer is String) {
-            painValue = int.parse(answer);
-            // 👇 ป้องกันการ setState ซ้ำซ้อน
-            if (!selectedPainValueMap.containsKey(question.numberQuestion)) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                setState(() {
-                  selectedPainValueMap[question.numberQuestion] = painValue;
-                });
-              });
-            }
-          }
-        } else {
-          painValue = selectedPainValueMap[question.numberQuestion] ?? 0;
-        }
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            RichText(
-              text: TextSpan(
-                style: TextStyle(fontSize: 16),
-                children: _buildHightlightText(
-                  question,
-                  question.questionHighlight,
-                ),
-              ),
+  Widget _buildLavelChoice(
+    BuildContext context, {
+    required Question question,
+    String? parentId,
+    int? valueLocal,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        RichText(
+          text: TextSpan(
+            style: TextStyle(fontSize: 16),
+            children: _buildHightlightText(
+              question,
+              question.questionHighlight,
             ),
-            const SizedBox(height: 40),
-            LavelPainWidget(
-              labelLeft: question.labelLeft.tr(),
-              labelRight: question.labelRight.tr(),
-              onPainSelected: (value) {
-                setState(() {
-                  selectedPainValueMap[question.numberQuestion] = value;
-                });
-                final painValue = selectedPainValueMap[question.numberQuestion];
-                widget.onAnswer?.call(
-                  question.numberQuestion,
-                  painValue,
-                  parentId,
-                );
-              },
-              initialPainValue: painValue,
-            ),
-          ],
-        );
-      },
+          ),
+        ),
+        const SizedBox(height: 40),
+        LavelPainWidget(
+          labelLeft: question.labelLeft.tr(),
+          labelRight: question.labelRight.tr(),
+          onPainSelected: (value) {
+            setState(() {
+              selectedPainValueMap[question.numberQuestion] = value;
+            });
+            final painValue = selectedPainValueMap[question.numberQuestion];
+            widget.onAnswer?.call(question.numberQuestion, painValue, parentId);
+          },
+          initialPainValue:
+              valueLocal ?? selectedPainValueMap[question.numberQuestion],
+        ),
+      ],
     );
   }
 

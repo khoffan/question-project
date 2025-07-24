@@ -8,7 +8,7 @@ abstract class FormLocalDataSource {
   Future<void> saveAnswerLocal(String questionId, dynamic answers);
   Future<void> saveAllAnswer(String patientId, List<AnswerModel> formAnswer);
   Future<List<AnswerModel>> getAllAnswer(String patientId);
-  Future<dynamic> getAnswer(String questionId);
+  Future<Map<String, dynamic>> getAllAnswers();
   Future<void> deleteAllAnswer();
 }
 
@@ -46,6 +46,7 @@ class FormLocalDataSourceImpl implements FormLocalDataSource {
   ) async {
     try {
       final endcode = jsonEncode(formAnswer.map((e) => e.toJson()).toList());
+      print(endcode);
 
       await _sharedPrefService.setString("answers_$patientId", endcode);
     } catch (e) {
@@ -54,18 +55,30 @@ class FormLocalDataSourceImpl implements FormLocalDataSource {
   }
 
   @override
-  Future<dynamic> getAnswer(String questionId) async {
+  Future<Map<String, dynamic>> getAllAnswers() async {
     try {
-      final answers = _sharedPrefService.getString("answer_$questionId");
-      print("answer = $answers");
-      if (answers != null) {
-        final decoded = jsonDecode(answers);
-        return decoded;
+      final keys = _sharedPrefService.getKeys(); // ได้ List<String>
+      final Map<String, dynamic> allAnswers = {};
+
+      for (final key in keys) {
+        if (key.startsWith("answer_")) {
+          final questionId = key.replaceFirst("answer_", "");
+          final raw = _sharedPrefService.getString(key);
+          if (raw != null) {
+            try {
+              final decoded = jsonDecode(raw);
+              allAnswers[questionId] = decoded;
+            } catch (e) {
+              debugPrint("decode error at $key: $e");
+            }
+          }
+        }
       }
-      return null;
+
+      return allAnswers;
     } catch (e) {
-      debugPrint("get answer local error: $e");
-      return null;
+      debugPrint("get all answer local error: $e");
+      return {};
     }
   }
 
@@ -90,7 +103,7 @@ class FormLocalDataSourceImpl implements FormLocalDataSource {
       final keys = _sharedPrefService.getKeys();
 
       for (final key in keys) {
-        if (!key.startsWith("answer_")) {
+        if (!key.startsWith("answers")) {
           await _sharedPrefService.remove(key);
         }
       }
