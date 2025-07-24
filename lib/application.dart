@@ -28,6 +28,7 @@ class _ApplicationState extends State<Application> {
   String _patientName = '';
   late List<Question> questionList;
   bool isSubmit = false;
+  String _comment = "";
 
   ScrollController scrollController = ScrollController();
 
@@ -68,8 +69,13 @@ class _ApplicationState extends State<Application> {
     cubit.saveLocal(questionId.tr(), value);
   }
 
+  void _changeComment(String comment) {
+    setState(() {
+      _comment = comment;
+    });
+  }
+
   void _saveComment(String comment) {
-    // print(comment);
     context.read<AnswerCubit>().saveAnswer(
       questionId: 'comment',
       value: comment.toString(),
@@ -192,6 +198,29 @@ class _ApplicationState extends State<Application> {
     downloadJsonFIle(csvString, "answer_${_patientName}_${DateTime.now()}.csv");
   }
 
+  void _saveFormAnswer(Map<String, dynamic> ansMap) {
+    final modifiedAnsMap = ansMap.map((key, value) {
+      if (key.contains("comment")) {
+        return MapEntry(key, value);
+      } else if (value is String) {
+        return MapEntry('question${key}_answer', value);
+      } else if (value is Map<String, List<TapPointEntity>>) {
+        return MapEntry('question${key}_answer', value.toString());
+      }
+      return MapEntry('question${key}_answer', '');
+    });
+
+    final combineMap = {
+      "user_id": _userId,
+      "user_name": _userName,
+      "patient_id": _patientId,
+      "patient_name": _patientName,
+      ...modifiedAnsMap,
+    };
+
+    context.read<AnswerCubit>().saveFormAnswer(combineMap);
+  }
+
   @override
   Widget build(BuildContext context) {
     context.locale;
@@ -265,120 +294,24 @@ class _ApplicationState extends State<Application> {
                       );
                     }),
                     const SizedBox(height: 30),
-                    CommentBoxWidget(onComment: _saveComment),
+                    CommentBoxWidget(onComment: _changeComment),
                     const SizedBox(height: 30),
                     ElevatedButton(
                       onPressed: () {
+                        _saveComment(_comment);
                         setState(() {
                           isSubmit = true;
                         });
+                        if (isSubmit) {
+                          final answers = context.read<AnswerCubit>().state;
+                          final sortedAnswers = sortedAnswerList(answers);
+                          final ansMap = flattrenAnswerList(sortedAnswers);
+                          _saveFormAnswer(ansMap);
+                        }
                       },
                       child: const Text("Submit"),
                     ),
-                    if (isSubmit)
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          if (constraints.maxWidth <= 360) {
-                            return Column(
-                              children: [
-                                ElevatedButton(
-                                  onPressed: () {
-                                    final answers =
-                                        context.read<AnswerCubit>().state;
-                                    final sortedAnswers = sortedAnswerList(
-                                      answers,
-                                    );
-                                    final json = exportAnswer2Json(
-                                      sortedAnswers,
-                                    );
-                                    downloadJsonFIle(
-                                      json,
-                                      "answer_${_patientName}_${DateTime.now().millisecondsSinceEpoch}.json",
-                                    );
-                                  },
-                                  child: Text(
-                                    'questionire.button.export_json'.tr(),
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    final answers =
-                                        context.read<AnswerCubit>().state;
-                                    final sortedAnswers = sortedAnswerList(
-                                      answers,
-                                    );
-                                    exportJson2Csv(answers: sortedAnswers);
-                                  },
-                                  child: Text(
-                                    'questionire.button.export_csv'.tr(),
-                                  ),
-                                ),
-                              ],
-                            );
-                          }
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              ElevatedButton(
-                                onPressed: () async {
-                                  final answers =
-                                      context.read<AnswerCubit>().state;
-                                  final sortedAnswers = sortedAnswerList(
-                                    answers,
-                                  );
-                                  final json = exportAnswer2Json(sortedAnswers);
-                                  context
-                                      .read<AnswerCubit>()
-                                      .saveAllAnswerLocal(
-                                        patientId: _patientId,
-                                        answers: sortedAnswers,
-                                      );
-                                  downloadJsonFIle(
-                                    json,
-                                    "answer_${_patientName}_${DateTime.now().millisecondsSinceEpoch}.json",
-                                  );
-                                  context
-                                      .read<AnswerCubit>()
-                                      .clearAllAnswerLocal();
-                                  setState(() {
-                                    isSubmit = false;
-                                  });
-                                },
-                                child: Text(
-                                  'questionire.button.export_json'.tr(),
-                                ),
-                              ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  final answers =
-                                      context.read<AnswerCubit>().state;
-                                  final sortedAnswers = sortedAnswerList(
-                                    answers,
-                                  );
-                                  context
-                                      .read<AnswerCubit>()
-                                      .saveAllAnswerLocal(
-                                        patientId: _patientId,
-                                        answers: sortedAnswers,
-                                      );
-                                  exportJson2Csv(answers: sortedAnswers);
-                                  context
-                                      .read<AnswerCubit>()
-                                      .clearAllAnswerLocal();
-
-                                  setState(() {
-                                    isSubmit = false;
-                                  });
-                                },
-                                child: Text(
-                                  'questionire.button.export_csv'.tr(),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
+                    if (isSubmit) _exportButton(context),
                   ],
                 ),
               );
@@ -386,6 +319,131 @@ class _ApplicationState extends State<Application> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _exportButton(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth <= 360) {
+          return Column(
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  final answers = context.read<AnswerCubit>().state;
+                  final sortedAnswers = sortedAnswerList(answers);
+                  final ansMap = flattrenAnswerList(sortedAnswers);
+
+                  final modifiedAnsMap = ansMap.map((key, value) {
+                    if (key.contains("comment")) {
+                      return MapEntry(key, value);
+                    } else if (value is String) {
+                      return MapEntry('question${key}_answer', value);
+                    } else if (value is Map<String, List<TapPointEntity>>) {
+                      return MapEntry(
+                        'question${key}_answer',
+                        value.toString(),
+                      );
+                    }
+                    return MapEntry('question${key}_answer', '');
+                  });
+
+                  final combineMap = {
+                    "user_id": _userId,
+                    "user_name": _userName,
+                    "patient_id": _patientId,
+                    "patient_name": _patientName,
+                    ...modifiedAnsMap,
+                  };
+                  context.read<AnswerCubit>().saveAllAnswerLocal(
+                    patientId: '',
+                    answers: sortedAnswers,
+                  );
+                  downloadJsonFIle(
+                    jsonEncode(combineMap),
+                    "answer_map_${_patientName}_${DateTime.now()}.json",
+                  );
+                  context.read<AnswerCubit>().clearAllAnswerLocal();
+                  setState(() {
+                    isSubmit = false;
+                  });
+                },
+                child: Text('questionire.button.export_json'.tr()),
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () {
+                  final answers = context.read<AnswerCubit>().state;
+                  final sortedAnswers = sortedAnswerList(answers);
+                  exportJson2Csv(answers: sortedAnswers);
+                },
+                child: Text('questionire.button.export_csv'.tr()),
+              ),
+            ],
+          );
+        }
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            ElevatedButton(
+              onPressed: () async {
+                final answers = context.read<AnswerCubit>().state;
+                final sortedAnswers = sortedAnswerList(answers);
+                context.read<AnswerCubit>().saveAllAnswerLocal(
+                  patientId: _patientId,
+                  answers: sortedAnswers,
+                );
+                final ansMap = flattrenAnswerList(sortedAnswers);
+
+                final modifiedAnsMap = ansMap.map((key, value) {
+                  if (key.contains("comment")) {
+                    return MapEntry(key, value);
+                  } else if (value is String) {
+                    return MapEntry('question${key}_answer', value);
+                  } else if (value is Map<String, List<TapPointEntity>>) {
+                    return MapEntry('question${key}_answer', value.toString());
+                  }
+                  return MapEntry('question${key}_answer', '');
+                });
+
+                final combineMap = {
+                  "user_id": _userId,
+                  "user_name": _userName,
+                  "patient_id": _patientId,
+                  "patient_name": _patientName,
+                  ...modifiedAnsMap,
+                };
+                downloadJsonFIle(
+                  jsonEncode(combineMap),
+                  "answer_map_${_patientName}_${DateTime.now()}.json",
+                );
+                context.read<AnswerCubit>().clearAllAnswerLocal();
+                setState(() {
+                  isSubmit = false;
+                });
+              },
+              child: Text('questionire.button.export_json'.tr()),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final answers = context.read<AnswerCubit>().state;
+                final sortedAnswers = sortedAnswerList(answers);
+                context.read<AnswerCubit>().saveAllAnswerLocal(
+                  patientId: _patientId,
+                  answers: sortedAnswers,
+                );
+                exportJson2Csv(answers: sortedAnswers);
+                context.read<AnswerCubit>().clearAllAnswerLocal();
+
+                setState(() {
+                  isSubmit = false;
+                });
+              },
+              child: Text('questionire.button.export_csv'.tr()),
+            ),
+          ],
+        );
+      },
     );
   }
 }

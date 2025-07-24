@@ -2,16 +2,19 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:questionnaire/datasource/form_datasource.dart';
 import 'package:questionnaire/datasource/form_local_datasouce.dart';
 import 'package:questionnaire/model/answer_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AnswerCubit extends Cubit<List<AnswerModel>> {
   final FormLocalDataSource formLocalDataSource;
+  final FormDataSource formDataSource;
   final SharedPreferences sharedPrefService;
 
   AnswerCubit({
     required this.formLocalDataSource,
+    required this.formDataSource,
     required this.sharedPrefService,
   }) : super([]);
 
@@ -19,7 +22,7 @@ class AnswerCubit extends Cubit<List<AnswerModel>> {
     required String patientId,
     required List<AnswerModel> answers,
   }) async {
-    print(answers.length);
+    // print(answers.length);
     await formLocalDataSource.saveAllAnswer(patientId, answers);
   }
 
@@ -193,7 +196,7 @@ class AnswerCubit extends Cubit<List<AnswerModel>> {
       // ถ้าไม่ใช่ตัวแรกที่จบด้วย yes/no เราก็ผูก parentId
       parentId = currentParentId;
 
-      print('questionId: $questionId, answer: $answer, parentId: $parentId');
+      // print('questionId: $questionId, answer: $answer, parentId: $parentId');
 
       saveAnswer(questionId: questionId, value: answer, parentId: parentId);
     }
@@ -201,5 +204,9 @@ class AnswerCubit extends Cubit<List<AnswerModel>> {
 
   void saveLocal(String questionId, dynamic answer) async {
     await formLocalDataSource.saveAnswerLocal(questionId, answer);
+  }
+
+  void saveFormAnswer(Map<String, dynamic> data) async {
+    await formDataSource.saveFormAnswer(data);
   }
 }

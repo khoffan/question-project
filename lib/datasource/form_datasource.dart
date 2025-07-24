@@ -5,14 +5,16 @@ import 'package:questionnaire/model/question_model.dart';
 
 abstract class FormDataSource {
   Future<List<Question>?> getQuestions();
-  Future<FormAnswerModel?> saveFormAnswer(FormAnswerModel formAnswerModel);
+  Future<Map<String, dynamic>?> saveFormAnswer(
+    Map<String, dynamic> formAnswerModel,
+  );
 }
 
 class FormDataSourceImpl implements FormDataSource {
   FormDataSourceImpl({Dio? dio}) : _dio = dio ?? Dio();
 
   final Dio _dio;
-  final String baseApiUrl = "http://localhost:3000/api";
+  final String baseApiUrl = "http://localhost:1112";
 
   @override
   Future<List<Question>?> getQuestions() async {
@@ -26,16 +28,16 @@ class FormDataSourceImpl implements FormDataSource {
   }
 
   @override
-  Future<FormAnswerModel?> saveFormAnswer(
-    FormAnswerModel formAnswerModel,
+  Future<Map<String, dynamic>?> saveFormAnswer(
+    Map<String, dynamic> formAnswerModel,
   ) async {
     try {
       final response = await _dio.post(
         "$baseApiUrl/form",
-        data: formAnswerModel.toJson(),
+        data: formAnswerModel,
       );
       if (response.statusCode == 200) {
-        return FormAnswerModel.fromJson(response.data);
+        return response.data;
       }
       return null;
     } catch (e) {

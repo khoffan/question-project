@@ -47,6 +47,7 @@ class _CommentBoxWidgetState extends State<CommentBoxWidget> {
                 hintText: "questionire.end.text_box.title".tr(),
                 contentPadding: const EdgeInsets.all(8),
               ),
+              onChanged: widget.onComment,
               onFieldSubmitted: widget.onComment,
               controller: _controller,
             ),
