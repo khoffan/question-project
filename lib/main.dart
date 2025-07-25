@@ -1,30 +1,45 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:questionnaire_project/application.dart';
-import 'package:questionnaire_project/cubit/answer_cubit.dart';
-import 'package:questionnaire_project/model/question_model.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'package:questionnaire/application.dart';
+import 'package:questionnaire/cubit/answer_cubit.dart';
+import 'package:questionnaire/cubit/form_cubit.dart';
+import 'package:questionnaire/datasource/form_datasource.dart';
+import 'package:questionnaire/model/question_model.dart';
+import 'package:questionnaire/singleton/shared_pref_instance.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final questions = await loadQuestions();
-  runApp(MyApp(questions: questions));
-}
+  await SharedPrefInstance.init();
 
-Future<List<Question>> loadQuestions() async {
-  final jsonString = await rootBundle.loadString(
-    'assets/question/questions.json',
-  );
-  final jsonMap = json.decode(jsonString);
-  if (jsonMap is List) {
-    final questionList = jsonMap.map((e) => Question.fromJson(e)).toList();
-    return questionList;
-  } else {
-    throw Exception('Invalid JSON format');
+  // Future<List<Question>> loadQuestions() async {
+  //   final jsonString = await rootBundle.loadString(
+  //     'assets/question/questions.json',
+  //   );
+  //   final jsonMap = json.decode(jsonString);
+  //   if (jsonMap is List) {
+  //     final questionList = jsonMap.map((e) => Question.fromJson(e)).toList();
+  //     return questionList;
+  //   } else {
+  //     throw Exception('Invalid JSON format');
+  //   }
+  // }
+
+  final form =
+      await FormDataSourceImpl(
+        sharedPreferences: SharedPrefInstance.instance,
+      ).getFormQuestions() ??
+      [];
+  if (kIsWeb) {
+    usePathUrlStrategy();
   }
+  runApp(MyApp(questions: form.first.questions));
 }
 
 class MyApp extends StatelessWidget {
@@ -36,8 +51,18 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'PAINPREDICT',
       debugShowCheckedModeBanner: false,
-      home: BlocProvider(
-        create: (context) => AnswerCubit(),
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (context) => AnswerCubit()),
+          BlocProvider(
+            create:
+                (context) => FormCubit(
+                  FormDataSourceImpl(
+                    sharedPreferences: SharedPrefInstance.instance,
+                  ),
+                ),
+          ),
+        ],
         child: Application(questions: questions),
       ),
     );
