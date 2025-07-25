@@ -40,6 +40,10 @@ class _ApplicationState extends State<Application> {
     super.initState();
 
     FlutterLineLiff.instance.ready.then((value) {
+      print("ready");
+      if (!FlutterLineLiff.instance.isLoggedIn) {
+        FlutterLineLiff.instance.login();
+      }
       setState(() {
         _isLineReady = true;
       });
@@ -261,95 +265,106 @@ class _ApplicationState extends State<Application> {
         body: FutureBuilder<Profile?>(
           future: FlutterLineLiff.instance.profile,
           builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              if (snapshot.hasData) {
-                return Center(child: Text("hello ${snapshot.data}"));
-              } else {
-                return const Center(child: Text("Hello World"));
-              }
-            } else {
+            if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             }
+            if (snapshot.connectionState == ConnectionState.done &&
+                snapshot.hasData) {
+              final profile = snapshot.data!;
+              _userName = profile.displayName;
+              _userId = profile.userId;
+              _patientId = profile.userId;
+              _patientName = profile.displayName;
+              return SingleChildScrollView(
+                controller: scrollController,
+                child: Center(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return Container(
+                        constraints: BoxConstraints(maxWidth: 1260),
+                        color: Colors.white,
+                        padding: const EdgeInsets.all(36),
+                        child: Column(
+                          children: [
+                            Text(
+                              'questionire.title'.tr(),
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Container(
+                              padding: const EdgeInsets.only(
+                                bottom: 8,
+                                left: 4,
+                                right: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.black,
+                                  width: 2,
+                                ),
+                              ),
+                              child: Text(
+                                "questionire.subtitle".tr(),
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            SizedBox(
+                              child: Text(
+                                "questionire.detail".tr(),
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+
+                            const SizedBox(height: 18),
+                            ...questionList.map((question) {
+                              return QuestionWidget(
+                                isSubmit: isSubmit,
+                                question: question,
+                                onAnswer: _saveAnswer,
+                              );
+                            }),
+                            const SizedBox(height: 30),
+                            CommentBoxWidget(onComment: _changeComment),
+                            const SizedBox(height: 30),
+                            ElevatedButton(
+                              onPressed: () {
+                                _saveComment(_comment);
+                                setState(() {
+                                  isSubmit = true;
+                                });
+                                if (isSubmit) {
+                                  final answers =
+                                      context.read<AnswerCubit>().state;
+                                  final sortedAnswers = sortedAnswerList(
+                                    answers,
+                                  );
+                                  final ansMap = flattrenAnswerList(
+                                    sortedAnswers,
+                                  );
+                                  _saveFormAnswer(ansMap);
+                                }
+                              },
+                              child: const Text("Submit"),
+                            ),
+                            if (isSubmit) _exportButton(context),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              );
+            }
+            return const SizedBox.shrink();
           },
         ),
-        // body: SingleChildScrollView(
-        //   controller: scrollController,
-        //   child: Center(
-        //     child: LayoutBuilder(
-        //       builder: (context, constraints) {
-        //         return Container(
-        //           constraints: BoxConstraints(maxWidth: 1260),
-        //           color: Colors.white,
-        //           padding: const EdgeInsets.all(36),
-        //           child: Column(
-        //             children: [
-        //               Text(
-        //                 'questionire.title'.tr(),
-        //                 style: TextStyle(
-        //                   fontSize: 28,
-        //                   fontWeight: FontWeight.bold,
-        //                 ),
-        //               ),
-        //               const SizedBox(height: 16),
-        //               Container(
-        //                 padding: const EdgeInsets.only(
-        //                   bottom: 8,
-        //                   left: 4,
-        //                   right: 4,
-        //                 ),
-        //                 decoration: BoxDecoration(
-        //                   border: Border.all(color: Colors.black, width: 2),
-        //                 ),
-        //                 child: Text(
-        //                   "questionire.subtitle".tr(),
-        //                   style: TextStyle(
-        //                     fontSize: 18,
-        //                     fontWeight: FontWeight.w600,
-        //                   ),
-        //                 ),
-        //               ),
-        //               const SizedBox(height: 16),
-        //               SizedBox(
-        //                 child: Text(
-        //                   "questionire.detail".tr(),
-        //                   style: TextStyle(fontSize: 16),
-        //                 ),
-        //               ),
-
-        //               const SizedBox(height: 18),
-        //               ...questionList.map((question) {
-        //                 return QuestionWidget(
-        //                   isSubmit: isSubmit,
-        //                   question: question,
-        //                   onAnswer: _saveAnswer,
-        //                 );
-        //               }),
-        //               const SizedBox(height: 30),
-        //               CommentBoxWidget(onComment: _changeComment),
-        //               const SizedBox(height: 30),
-        //               ElevatedButton(
-        //                 onPressed: () {
-        //                   _saveComment(_comment);
-        //                   setState(() {
-        //                     isSubmit = true;
-        //                   });
-        //                   if (isSubmit) {
-        //                     final answers = context.read<AnswerCubit>().state;
-        //                     final sortedAnswers = sortedAnswerList(answers);
-        //                     final ansMap = flattrenAnswerList(sortedAnswers);
-        //                     _saveFormAnswer(ansMap);
-        //                   }
-        //                 },
-        //                 child: const Text("Submit"),
-        //               ),
-        //               if (isSubmit) _exportButton(context),
-        //             ],
-        //           ),
-        //         );
-        //       },
-        //     ),
-        //   ),
-        // ),
       );
     }
   }
