@@ -1,6 +1,3 @@
-import 'dart:convert';
-
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:questionnaire/datasource/form_datasource.dart';
 import 'package:questionnaire/datasource/form_local_datasouce.dart';
@@ -127,51 +124,51 @@ class AnswerCubit extends Cubit<List<AnswerModel>> {
     return updatedList;
   }
 
-  List<AnswerModel> _updateOrinsert(
-    List<AnswerModel> list,
-    String questionId,
-    String value,
-    Map<String, List<TapPointEntity>>? tapPoints,
-    String? parentId,
-  ) {
-    bool updated = false;
-    List<AnswerModel> updatedList = [];
+  // List<AnswerModel> _updateOrinsert(
+  //   List<AnswerModel> list,
+  //   String questionId,
+  //   String value,
+  //   Map<String, List<TapPointEntity>>? tapPoints,
+  //   String? parentId,
+  // ) {
+  //   bool updated = false;
+  //   List<AnswerModel> updatedList = [];
 
-    for (final answer in list) {
-      if (answer.numberQuestion == questionId && parentId == null) {
-        updatedList.add(answer.copyWith(answer: value, tapPoints: tapPoints));
-        updated = true;
-      } else if (answer.numberQuestion == parentId) {
-        updatedList.add(
-          answer.copyWith(
-            subAnswers: _updateOrinsert(
-              answer.subAnswers,
-              questionId,
-              value,
-              null,
-              null,
-            ),
-          ),
-        );
-        updated = true;
-      } else {
-        updatedList.add(answer);
-      }
-    }
+  //   for (final answer in list) {
+  //     if (answer.numberQuestion == questionId && parentId == null) {
+  //       updatedList.add(answer.copyWith(answer: value, tapPoints: tapPoints));
+  //       updated = true;
+  //     } else if (answer.numberQuestion == parentId) {
+  //       updatedList.add(
+  //         answer.copyWith(
+  //           subAnswers: _updateOrinsert(
+  //             answer.subAnswers,
+  //             questionId,
+  //             value,
+  //             null,
+  //             null,
+  //           ),
+  //         ),
+  //       );
+  //       updated = true;
+  //     } else {
+  //       updatedList.add(answer);
+  //     }
+  //   }
 
-    if (!updated && parentId == null) {
-      updatedList.add(
-        AnswerModel(
-          numberQuestion: questionId,
-          answer: value,
-          tapPoints: tapPoints,
-          subAnswers: [],
-        ),
-      );
-    }
+  //   if (!updated && parentId == null) {
+  //     updatedList.add(
+  //       AnswerModel(
+  //         numberQuestion: questionId,
+  //         answer: value,
+  //         tapPoints: tapPoints,
+  //         subAnswers: [],
+  //       ),
+  //     );
+  //   }
 
-    return updatedList;
-  }
+  //   return updatedList;
+  // }
 
   Future<void> restoreAnswersFromLocal() async {
     final answersMap =
