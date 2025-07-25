@@ -1,38 +1,25 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:questionnaire/model/answer_model.dart';
 import 'package:questionnaire/model/question_model.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class FormDataSource {
-  Future<List<FormModel>?> getFormQuestions();
-  Future<FormAnswerModel?> saveFormAnswer(FormAnswerModel formAnswerModel);
+  Future<List<Question>?> getQuestions();
+  Future<Map<String, dynamic>?> saveFormAnswer(
+    Map<String, dynamic> formAnswerModel,
+  );
 }
 
 class FormDataSourceImpl implements FormDataSource {
-  FormDataSourceImpl({Dio? dio, SharedPreferences? sharedPreferences})
-    : _dio = dio ?? Dio(),
-      _sharedPreferences = sharedPreferences!;
+  FormDataSourceImpl({Dio? dio}) : _dio = dio ?? Dio();
 
   final Dio _dio;
-  final SharedPreferences _sharedPreferences;
-  final String baseApiUrl = "http://localhost:3000/api";
-  String answerKey(String formid) {
-    return "answer_key_$formid";
-  }
+  final String baseApiUrl = "http://localhost:1112";
 
   @override
-  Future<List<FormModel>?> getFormQuestions() async {
+  Future<List<Question>?> getQuestions() async {
     try {
-      final response = await _dio.get("$baseApiUrl/forms");
-      if (response.statusCode == 200) {
-        print("data: ${response.data}");
-        final data = response.data;
-        return (data as List).map((x) => FormModel.fromJson(x)).toList();
-      }
-      return [];
+      await _dio.get("$baseApiUrl/questions");
+      return null;
     } catch (e) {
       debugPrint(e.toString());
       return [];
@@ -40,21 +27,16 @@ class FormDataSourceImpl implements FormDataSource {
   }
 
   @override
-  Future<FormAnswerModel?> saveFormAnswer(
-    FormAnswerModel formAnswerModel,
+  Future<Map<String, dynamic>?> saveFormAnswer(
+    Map<String, dynamic> formAnswerModel,
   ) async {
     try {
-      final key = answerKey(formAnswerModel.formId);
-      await _sharedPreferences.setString(
-        key,
-        jsonEncode(formAnswerModel.toJson()),
-      );
       final response = await _dio.post(
-        "$baseApiUrl/answer",
-        data: formAnswerModel.toJson(),
+        "$baseApiUrl/form",
+        data: formAnswerModel,
       );
       if (response.statusCode == 200) {
-        return FormAnswerModel.fromJson(response.data);
+        return response.data;
       }
       return null;
     } catch (e) {
