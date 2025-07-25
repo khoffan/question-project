@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 // นี่คือวิดเจ็ตแสดงผลมาตรวัดความเจ็บปวดที่สามารถคลิกได้และตอบสนองต่อขนาดหน้าจอ
@@ -47,6 +48,7 @@ class _LavelPainWidgetState extends State<LavelPainWidget> {
 
   @override
   Widget build(BuildContext context) {
+    context.locale;
     return LayoutBuilder(
       builder: (context, constraints) {
         // final double availableWidth =
@@ -82,17 +84,21 @@ class _LavelPainWidgetState extends State<LavelPainWidget> {
   }
 
   double calculateSidePadding(double maxWidth) {
-    const double baseWidth = 1188;
-    const double stepWidth = 200; // ทุก ๆ 200px ลดลงทีละ 10
-    const double startPadding = 60;
-    const double minPadding = 20;
+    final itemCount = painValues.length;
+    final itemWidth = maxWidth / itemCount;
+    final padding = itemWidth / 2;
+    return padding;
+    // const double baseWidth = 1188;
+    // const double stepWidth = 200; // ทุก ๆ 200px ลดลงทีละ 10
+    // const double startPadding = 60;
+    // const double minPadding = 10;
 
-    // คำนวณจำนวนช่วงที่ลดลง
-    final double diff = baseWidth - maxWidth;
-    final int steps = (diff / stepWidth).floor();
+    // // คำนวณจำนวนช่วงที่ลดลง
+    // final double diff = baseWidth - maxWidth;
+    // final int steps = (diff / stepWidth).floor();
 
-    final double calculated = startPadding - (steps * 20);
-    return calculated.clamp(minPadding, startPadding);
+    // final double calculated = startPadding - (steps * 5);
+    // return calculated.clamp(minPadding, startPadding);
   }
 
   _buildLineCheckBox({
@@ -104,6 +110,7 @@ class _LavelPainWidgetState extends State<LavelPainWidget> {
     required String labelRight,
   }) {
     double sidePadding = calculateSidePadding(maxWidth);
+    // print("sidePadding = $maxWidth");
 
     return SizedBox(
       width: maxWidth,
@@ -112,7 +119,7 @@ class _LavelPainWidgetState extends State<LavelPainWidget> {
           Positioned(
             left: sidePadding,
             right: sidePadding,
-            top: 25,
+            top: maxWidth < 800 ? 20 : 25,
             child: Container(height: 2, color: Colors.black),
           ),
           Row(
@@ -185,10 +192,6 @@ class _LavelPainWidgetState extends State<LavelPainWidget> {
                                   color: Colors.black,
                                 ),
                               ),
-                              activeColor:
-                                  Colors.blue[100], // สีพื้นหลังเมื่อถูกเลือก
-                              checkColor:
-                                  Colors.blue[700], // สีของเครื่องหมายถูก
                               materialTapTargetSize:
                                   MaterialTapTargetSize
                                       .shrinkWrap, // ให้ขนาดเล็กลง

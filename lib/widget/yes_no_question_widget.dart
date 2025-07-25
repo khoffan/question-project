@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class YesNoQuestionWidget extends StatefulWidget {
   const YesNoQuestionWidget({
@@ -16,6 +17,7 @@ class YesNoQuestionWidget extends StatefulWidget {
 class _YesNoQuestionWidgetState extends State<YesNoQuestionWidget> {
   @override
   Widget build(BuildContext context) {
+    context.locale;
     return LayoutBuilder(
       builder: (context, constraints) {
         final double horizontalPadding =
@@ -30,14 +32,14 @@ class _YesNoQuestionWidgetState extends State<YesNoQuestionWidget> {
                   widget.onYesNoSelected(value == true ? 1 : null);
                 },
               ),
-              const Text("No"),
+              Text("questionire.yes_no.no".tr()),
               Checkbox(
                 value: widget.initialYesNoValue == 2,
                 onChanged: (value) {
                   widget.onYesNoSelected(value == true ? 2 : null);
                 },
               ),
-              const Text("Yes"),
+              Text("questionire.yes_no.yes".tr()),
             ],
           ),
         );

@@ -46,6 +46,7 @@ class Question extends Equatable {
   final String labelRight;
   final bool isYesnoQuestion;
   final bool useChoice;
+  final bool useBodyGrid;
   final bool showSubQuestionOnYes;
   final List<Question> subQuestions;
   final List<ChoiceQuestion> choiceQuestions;
@@ -58,6 +59,7 @@ class Question extends Equatable {
     this.labelRight = "",
     this.isYesnoQuestion = false,
     this.useChoice = false,
+    this.useBodyGrid = false,
     this.showSubQuestionOnYes = false,
     this.subQuestions = const [],
     this.choiceQuestions = const [],
@@ -85,6 +87,7 @@ class Question extends Equatable {
       labelRight: json['labelRight'] ?? "",
       isYesnoQuestion: json['isYesnoQuestion'] ?? false,
       useChoice: json['useChoice'] ?? false,
+      useBodyGrid: json['useBodyGrid'] ?? false,
       showSubQuestionOnYes: json['showSubQuestionOnYes'] ?? false,
       subQuestions:
           json['subQuestions'] != null
@@ -113,6 +116,7 @@ class Question extends Equatable {
       'labelRight': labelRight,
       'isYesnoQuestion': isYesnoQuestion,
       'useChoice': useChoice,
+      'useBodyGrid': useBodyGrid,
       'showSubQuestionOnYes': showSubQuestionOnYes,
       'subQuestions':
           subQuestions.isNotEmpty
@@ -127,7 +131,7 @@ class Question extends Equatable {
 
   @override
   String toString() {
-    return 'Question(numberQuestion: $numberQuestion, question: $question, questionHighlight: $questionHighlight, labelLeft: $labelLeft, labelRight: $labelRight, isYesnoQuestion: $isYesnoQuestion, useChoice: $useChoice, showSubQuestionOnYes: $showSubQuestionOnYes, subQuestions: $subQuestions)';
+    return 'Question(numberQuestion: $numberQuestion, question: $question, questionHighlight: $questionHighlight, labelLeft: $labelLeft, labelRight: $labelRight, isYesnoQuestion: $isYesnoQuestion, useChoice: $useChoice, useBodyGrid: $useBodyGrid, showSubQuestionOnYes: $showSubQuestionOnYes, subQuestions: $subQuestions)';
   }
 
   @override
@@ -139,6 +143,7 @@ class Question extends Equatable {
     labelRight,
     isYesnoQuestion,
     useChoice,
+    useBodyGrid,
     showSubQuestionOnYes,
     subQuestions,
     choiceQuestions,
