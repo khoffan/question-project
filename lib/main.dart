@@ -12,9 +12,20 @@ import 'package:questionnaire/datasource/form_local_datasouce.dart';
 import 'package:questionnaire/model/question_model.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:questionnaire/singleton/shared_pref_service.dart';
+import 'package:flutter_line_liff/flutter_line_liff.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  FlutterLineLiff.instance.init(
+    config: Config(liffId: '2007816823-kDKGBgPX'),
+    successCallback: () {
+      debugPrint('init line success');
+    },
+    errorCallback: (e) {
+      debugPrint('init line error ${e.toString()}');
+    },
+  );
 
   final questions = await loadQuestions();
   if (kIsWeb) {

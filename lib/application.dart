@@ -12,6 +12,7 @@ import 'package:questionnaire/widget/comment_box_widget.dart';
 import 'package:questionnaire/widget/custom_dropdown.dart';
 import 'package:questionnaire/widget/question_widget.dart';
 import 'package:universal_html/html.dart' as html;
+import 'package:flutter_line_liff/flutter_line_liff.dart';
 
 class Application extends StatefulWidget {
   const Application({super.key, required this.questions});
@@ -29,12 +30,19 @@ class _ApplicationState extends State<Application> {
   late List<Question> questionList;
   bool isSubmit = false;
   String _comment = "";
+  bool _isLineReady = false;
 
   ScrollController scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
+
+    FlutterLineLiff.instance.ready.then((value) {
+      setState(() {
+        _isLineReady = true;
+      });
+    });
 
     questionList = widget.questions;
     final queryParams = Uri.base.queryParameters;
@@ -223,103 +231,112 @@ class _ApplicationState extends State<Application> {
 
   @override
   Widget build(BuildContext context) {
+    // if (_isLineReady) {
+    //   final profile = FlutterLineLiff.instance.profile;
+    //   print(profile);
+    // }
+
     context.locale;
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('PAINPREDICT'),
-        actions: [
-          CustomDropdown(
-            items: [
-              Items(value: "en", label: "English"),
-              Items(value: "th", label: "ไทย"),
-            ],
-            onChanged: (value) {
-              context.setLocale(Locale(value!));
-            },
-            initialValue: "en",
-          ),
-        ],
-      ),
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        controller: scrollController,
-        child: Center(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return Container(
-                constraints: BoxConstraints(maxWidth: 1260),
-                color: Colors.white,
-                padding: const EdgeInsets.all(36),
-                child: Column(
-                  children: [
-                    Text(
-                      'questionire.title'.tr(),
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Container(
-                      padding: const EdgeInsets.only(
-                        bottom: 8,
-                        left: 4,
-                        right: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.black, width: 2),
-                      ),
-                      child: Text(
-                        "questionire.subtitle".tr(),
+    if (!_isLineReady) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('PAINPREDICT'),
+          actions: [
+            CustomDropdown(
+              items: [
+                Items(value: "en", label: "English"),
+                Items(value: "th", label: "ไทย"),
+              ],
+              onChanged: (value) {
+                context.setLocale(Locale(value!));
+              },
+              initialValue: "en",
+            ),
+          ],
+        ),
+        backgroundColor: Colors.white,
+        body: SingleChildScrollView(
+          controller: scrollController,
+          child: Center(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return Container(
+                  constraints: BoxConstraints(maxWidth: 1260),
+                  color: Colors.white,
+                  padding: const EdgeInsets.all(36),
+                  child: Column(
+                    children: [
+                      Text(
+                        'questionire.title'.tr(),
                         style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    SizedBox(
-                      child: Text(
-                        "questionire.detail".tr(),
-                        style: TextStyle(fontSize: 16),
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.only(
+                          bottom: 8,
+                          left: 4,
+                          right: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black, width: 2),
+                        ),
+                        child: Text(
+                          "questionire.subtitle".tr(),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        child: Text(
+                          "questionire.detail".tr(),
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
 
-                    const SizedBox(height: 18),
-                    ...questionList.map((question) {
-                      return QuestionWidget(
-                        isSubmit: isSubmit,
-                        question: question,
-                        onAnswer: _saveAnswer,
-                      );
-                    }),
-                    const SizedBox(height: 30),
-                    CommentBoxWidget(onComment: _changeComment),
-                    const SizedBox(height: 30),
-                    ElevatedButton(
-                      onPressed: () {
-                        _saveComment(_comment);
-                        setState(() {
-                          isSubmit = true;
-                        });
-                        if (isSubmit) {
-                          final answers = context.read<AnswerCubit>().state;
-                          final sortedAnswers = sortedAnswerList(answers);
-                          final ansMap = flattrenAnswerList(sortedAnswers);
-                          _saveFormAnswer(ansMap);
-                        }
-                      },
-                      child: const Text("Submit"),
-                    ),
-                    if (isSubmit) _exportButton(context),
-                  ],
-                ),
-              );
-            },
+                      const SizedBox(height: 18),
+                      ...questionList.map((question) {
+                        return QuestionWidget(
+                          isSubmit: isSubmit,
+                          question: question,
+                          onAnswer: _saveAnswer,
+                        );
+                      }),
+                      const SizedBox(height: 30),
+                      CommentBoxWidget(onComment: _changeComment),
+                      const SizedBox(height: 30),
+                      ElevatedButton(
+                        onPressed: () {
+                          _saveComment(_comment);
+                          setState(() {
+                            isSubmit = true;
+                          });
+                          if (isSubmit) {
+                            final answers = context.read<AnswerCubit>().state;
+                            final sortedAnswers = sortedAnswerList(answers);
+                            final ansMap = flattrenAnswerList(sortedAnswers);
+                            _saveFormAnswer(ansMap);
+                          }
+                        },
+                        child: const Text("Submit"),
+                      ),
+                      if (isSubmit) _exportButton(context),
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   Widget _exportButton(BuildContext context) {
