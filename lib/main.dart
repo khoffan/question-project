@@ -13,7 +13,6 @@ import 'package:questionnaire/model/question_model.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:questionnaire/singleton/shared_pref_service.dart';
 import 'package:flutter_line_liff/flutter_line_liff.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -56,6 +55,7 @@ Future<List<Question>> loadQuestions() async {
   } else {
     throw Exception('Invalid JSON format');
   }
+
 }
 
 class MyApp extends StatelessWidget {
