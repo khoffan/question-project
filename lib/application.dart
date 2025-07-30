@@ -527,6 +527,7 @@ class _ApplicationState extends State<Application> {
                 // context.read<AnswerCubit>().clearAllAnswerLocal();
                 // isSubmit.value = false;
                 // setState(() {});
+
                 _exportPdfWithPdfPackage(combineMap);
               },
               child: Text('questionire.button.export_json'.tr()),
@@ -776,7 +777,11 @@ class _ApplicationState extends State<Application> {
     final bytes = await pdf.save();
 
     // ใช้ save หรือ share ตามต้องการ
-    saveFile(bytes);
+    if (Platform.isAndroid || Platform.isIOS) {
+      saveFileMobile(bytes);
+    } else {
+      saveFile(bytes);
+    }
     await Printing.sharePdf(bytes: bytes, filename: 'questionnaire.pdf');
   }
 }
