@@ -17,11 +17,13 @@ class BodyGridCanvasWidget extends StatefulWidget {
     required this.imagePath,
     required this.questionId,
     required this.label,
+    this.oldData = const {},
     required this.onTap,
   });
   final String imagePath;
   final String questionId;
   final String label;
+  final Map<String, List<TapPointEntity>> oldData;
   final Function(Map<String, List<TapPointEntity>>) onTap;
 
   @override
@@ -29,7 +31,7 @@ class BodyGridCanvasWidget extends StatefulWidget {
 }
 
 class _BodyGridCanvasWidgetState extends State<BodyGridCanvasWidget> {
-  final Map<String, List<TapPointEntity>> circlePointMap = {};
+  Map<String, List<TapPointEntity>> circlePointMap = {};
   ui.Image? bodyImage;
   ByteData? imagePixels;
 
@@ -50,6 +52,7 @@ class _BodyGridCanvasWidgetState extends State<BodyGridCanvasWidget> {
   @override
   void initState() {
     super.initState();
+    circlePointMap = Map<String, List<TapPointEntity>>.from(widget.oldData);
     loadBodyImage(widget.imagePath);
   }
 
@@ -103,6 +106,7 @@ class _BodyGridCanvasWidgetState extends State<BodyGridCanvasWidget> {
             .putIfAbsent(label, () => [])
             .add(TapPointEntity.fromOffset(local));
       });
+      print("circlePointMap: $circlePointMap");
       widget.onTap(circlePointMap);
     }
   }
