@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_line_liff/flutter_line_liff.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:questionnaire/application.dart';
 import 'package:questionnaire/cubit/answer_cubit.dart';
@@ -31,6 +32,16 @@ void main() async {
     usePathUrlStrategy();
     await SharedPrefsService.init();
   }
+
+  FlutterLineLiff.instance.init(
+    config: Config(liffId: '2007816823-nlgly1m2'),
+    successCallback: () {
+      debugPrint('success');
+    },
+    errorCallback: (e) {
+      debugPrint("line init error: $e");
+    },
+  );
 
   runApp(
     EasyLocalization(

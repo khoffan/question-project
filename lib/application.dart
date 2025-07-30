@@ -1,10 +1,17 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
+import 'package:universal_html/html.dart' as html;
+import 'package:flutter/services.dart' show rootBundle;
 
 import 'package:csv/csv.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_line_liff/flutter_line_liff.dart';
 import 'package:questionnaire/cubit/answer_cubit.dart';
 import 'package:questionnaire/cubit/form_cubit.dart';
 import 'package:questionnaire/model/answer_model.dart';
@@ -12,8 +19,10 @@ import 'package:questionnaire/model/question_model.dart';
 import 'package:questionnaire/widget/comment_box_widget.dart';
 import 'package:questionnaire/widget/custom_dropdown.dart';
 import 'package:questionnaire/widget/question_widget.dart';
-import 'package:universal_html/html.dart' as html;
-import 'package:flutter_line_liff/flutter_line_liff.dart';
+// import 'package:syncfusion_flutter_pdf/pdf.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 
 class Application extends StatefulWidget {
   const Application({super.key, required this.questions});
@@ -29,19 +38,23 @@ class _ApplicationState extends State<Application> {
   String _patientId = '';
   String _patientName = '';
   late List<Question> questionList;
-  bool isSubmit = false;
-  String _comment = "";
-  bool _isLineReady = false;
+  final ValueNotifier<bool> isSubmit = ValueNotifier<bool>(false);
+  final ValueNotifier<String> _comment = ValueNotifier<String>("");
+  bool _isReady = false;
+
 
   ScrollController scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-
-    FlutterLineLiff.instance.ready.then((value) {
+    FlutterLineLiff.instance.ready.then((_) {
+      debugPrint('Line ready');
+      if (!FlutterLineLiff.instance.isLoggedIn) {
+        FlutterLineLiff.instance.login();
+      }
       setState(() {
-        _isLineReady = true;
+        _isReady = true;
       });
     });
 
@@ -79,9 +92,7 @@ class _ApplicationState extends State<Application> {
   }
 
   void _changeComment(String comment) {
-    setState(() {
-      _comment = comment;
-    });
+    _comment.value = comment;
   }
 
   void _saveComment(String comment) {
@@ -238,8 +249,20 @@ class _ApplicationState extends State<Application> {
     // }
 
     context.locale;
-    if (!_isLineReady) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    if (!_isReady) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              Text("Loading...", style: TextStyle(fontSize: 16)),
+            ],
+          ),
+        ),
+      );
     } else {
       return Scaffold(
         appBar: AppBar(
@@ -261,95 +284,146 @@ class _ApplicationState extends State<Application> {
         body: FutureBuilder<Profile?>(
           future: FlutterLineLiff.instance.profile,
           builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              if (snapshot.hasData) {
-                return Center(child: Text("hello ${snapshot.data}"));
-              } else {
-                return const Center(child: Text("Hello World"));
-              }
-            } else {
-              return const Center(child: CircularProgressIndicator());
+            if (snapshot.connectionState == ConnectionState.done &&
+                snapshot.hasData) {
+              final data = snapshot.data;
+              _patientName = data?.displayName ?? '';
+              return SingleChildScrollView(
+                controller: scrollController,
+                child: Center(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return Container(
+                        constraints: BoxConstraints(maxWidth: 1260),
+                        color: Colors.white,
+                        padding: const EdgeInsets.all(36),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                ValueListenableBuilder(
+                                  valueListenable: isSubmit,
+                                  builder: (context, value, child) {
+                                    if (value) {
+                                      return _exportButton(context);
+                                    }
+                                    return const SizedBox.shrink();
+                                  },
+                                ),
+                                Row(
+                                  children: [
+                                    Text("Patient ID: $_patientId"),
+                                    const SizedBox(width: 8),
+                                    Text("Patient Name: $_patientName"),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            Text(
+                              'questionire.title'.tr(),
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Container(
+                              padding: const EdgeInsets.only(
+                                bottom: 8,
+                                left: 4,
+                                right: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.black,
+                                  width: 2,
+                                ),
+                              ),
+                              child: Text(
+                                "questionire.subtitle".tr(),
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            SizedBox(
+                              child: Text(
+                                "questionire.detail".tr(),
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+
+                            const SizedBox(height: 18),
+                            ...questionList.map((question) {
+                              return QuestionWidget(
+                                isSubmit: isSubmit.value,
+                                question: question,
+                                onAnswer: _saveAnswer,
+                              );
+                            }),
+                            const SizedBox(height: 30),
+                            CommentBoxWidget(onComment: _changeComment),
+                            const SizedBox(height: 30),
+                            ElevatedButton(
+                              onPressed: () {
+                                _saveComment(_comment.value);
+
+                                isSubmit.value = true;
+
+                                if (isSubmit.value) {
+                                  final answers =
+                                      context.read<AnswerCubit>().state;
+                                  final sortedAnswers = sortedAnswerList(
+                                    answers,
+                                  );
+                                  final ansMap = flattrenAnswerList(
+                                    sortedAnswers,
+                                  );
+                                  _saveFormAnswer(ansMap);
+                                  context
+                                      .read<AnswerCubit>()
+                                      .clearAllAnswerLocal();
+                                }
+                                setState(() {});
+
+                                showDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (BuildContext context) {
+                                    final navigate = Navigator.of(context);
+
+                                    Future.delayed(
+                                      const Duration(seconds: 2),
+                                      () {
+                                        if (navigate.canPop()) {
+                                          navigate.pop();
+                                        }
+                                      },
+                                    );
+
+                                    return AlertDialog(
+                                      title: const Text("Submit Form"),
+                                      content: const Text("Submit form สำเร็จ"),
+                                    );
+                                  },
+                                );
+                              },
+                              child: const Text("Submit"),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              );
             }
+            return const Center(child: CircularProgressIndicator());
           },
         ),
-        // body: SingleChildScrollView(
-        //   controller: scrollController,
-        //   child: Center(
-        //     child: LayoutBuilder(
-        //       builder: (context, constraints) {
-        //         return Container(
-        //           constraints: BoxConstraints(maxWidth: 1260),
-        //           color: Colors.white,
-        //           padding: const EdgeInsets.all(36),
-        //           child: Column(
-        //             children: [
-        //               Text(
-        //                 'questionire.title'.tr(),
-        //                 style: TextStyle(
-        //                   fontSize: 28,
-        //                   fontWeight: FontWeight.bold,
-        //                 ),
-        //               ),
-        //               const SizedBox(height: 16),
-        //               Container(
-        //                 padding: const EdgeInsets.only(
-        //                   bottom: 8,
-        //                   left: 4,
-        //                   right: 4,
-        //                 ),
-        //                 decoration: BoxDecoration(
-        //                   border: Border.all(color: Colors.black, width: 2),
-        //                 ),
-        //                 child: Text(
-        //                   "questionire.subtitle".tr(),
-        //                   style: TextStyle(
-        //                     fontSize: 18,
-        //                     fontWeight: FontWeight.w600,
-        //                   ),
-        //                 ),
-        //               ),
-        //               const SizedBox(height: 16),
-        //               SizedBox(
-        //                 child: Text(
-        //                   "questionire.detail".tr(),
-        //                   style: TextStyle(fontSize: 16),
-        //                 ),
-        //               ),
-
-        //               const SizedBox(height: 18),
-        //               ...questionList.map((question) {
-        //                 return QuestionWidget(
-        //                   isSubmit: isSubmit,
-        //                   question: question,
-        //                   onAnswer: _saveAnswer,
-        //                 );
-        //               }),
-        //               const SizedBox(height: 30),
-        //               CommentBoxWidget(onComment: _changeComment),
-        //               const SizedBox(height: 30),
-        //               ElevatedButton(
-        //                 onPressed: () {
-        //                   _saveComment(_comment);
-        //                   setState(() {
-        //                     isSubmit = true;
-        //                   });
-        //                   if (isSubmit) {
-        //                     final answers = context.read<AnswerCubit>().state;
-        //                     final sortedAnswers = sortedAnswerList(answers);
-        //                     final ansMap = flattrenAnswerList(sortedAnswers);
-        //                     _saveFormAnswer(ansMap);
-        //                   }
-        //                 },
-        //                 child: const Text("Submit"),
-        //               ),
-        //               if (isSubmit) _exportButton(context),
-        //             ],
-        //           ),
-        //         );
-        //       },
-        //     ),
-        //   ),
-        // ),
       );
     }
   }
@@ -396,9 +470,8 @@ class _ApplicationState extends State<Application> {
                     "answer_map_${_patientName}_${DateTime.now()}.json",
                   );
                   context.read<AnswerCubit>().clearAllAnswerLocal();
-                  setState(() {
-                    isSubmit = false;
-                  });
+                  isSubmit.value = false;
+                  setState(() {});
                 },
                 child: Text('questionire.button.export_json'.tr()),
               ),
@@ -408,6 +481,8 @@ class _ApplicationState extends State<Application> {
                   final answers = context.read<AnswerCubit>().state;
                   final sortedAnswers = sortedAnswerList(answers);
                   exportJson2Csv(answers: sortedAnswers);
+                  isSubmit.value = false;
+                  setState(() {});
                 },
                 child: Text('questionire.button.export_csv'.tr()),
               ),
@@ -415,7 +490,7 @@ class _ApplicationState extends State<Application> {
           );
         }
         return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
               onPressed: () async {
@@ -445,17 +520,18 @@ class _ApplicationState extends State<Application> {
                   "patient_name": _patientName,
                   ...modifiedAnsMap,
                 };
-                downloadJsonFIle(
-                  jsonEncode(combineMap),
-                  "answer_map_${_patientName}_${DateTime.now()}.json",
-                );
-                context.read<AnswerCubit>().clearAllAnswerLocal();
-                setState(() {
-                  isSubmit = false;
-                });
+                // downloadJsonFIle(
+                //   jsonEncode(combineMap),
+                //   "answer_map_${_patientName}_${DateTime.now()}.json",
+                // );
+                // context.read<AnswerCubit>().clearAllAnswerLocal();
+                // isSubmit.value = false;
+                // setState(() {});
+                _exportPdfWithPdfPackage(combineMap);
               },
               child: Text('questionire.button.export_json'.tr()),
             ),
+            const SizedBox(width: 10),
             ElevatedButton(
               onPressed: () {
                 final answers = context.read<AnswerCubit>().state;
@@ -465,11 +541,9 @@ class _ApplicationState extends State<Application> {
                   answers: sortedAnswers,
                 );
                 exportJson2Csv(answers: sortedAnswers);
-                context.read<AnswerCubit>().clearAllAnswerLocal();
 
-                setState(() {
-                  isSubmit = false;
-                });
+                isSubmit.value = false;
+                setState(() {});
               },
               child: Text('questionire.button.export_csv'.tr()),
             ),
@@ -477,5 +551,259 @@ class _ApplicationState extends State<Application> {
         );
       },
     );
+  }
+
+  // Future<void> _exportPdfDocument(Map<String, dynamic> data) async {
+  //   final fontData = await rootBundle.load('assets/fonts/THSarabunNew.ttf');
+  //   // print(fontData.buffer.asUint8List());
+  //   final buffer = fontData.buffer.asUint8List();
+
+  //   final document = PdfDocument();
+  //   PdfPage page = document.pages.add();
+  //   final pageSize = page.getClientSize();
+  //   final headerFont = PdfTrueTypeFont(buffer, 32, style: PdfFontStyle.bold);
+  //   final subHeaderFont = PdfTrueTypeFont(buffer, 24, style: PdfFontStyle.bold);
+  //   final font = PdfTrueTypeFont(buffer, 18);
+  //   // final font = PdfStandardFont(PdfFontFamily.helvetica, 14);
+
+  //   double y = 10;
+
+  //   final header = PdfTextElement(
+  //     text: "questionire.title".tr(),
+  //     font: headerFont,
+  //     format: PdfStringFormat(alignment: PdfTextAlignment.center),
+  //   );
+  //   final headerResult = header.draw(
+  //     page: page,
+  //     bounds: Rect.fromLTWH(10, y, pageSize.width - 20, double.infinity),
+  //   );
+  //   y = headerResult!.bounds.bottom + 4;
+
+  //   final subHeader = PdfTextElement(
+  //     text: "questionire.subtitle".tr(),
+  //     font: subHeaderFont,
+  //   );
+  //   final subHeaderResult = subHeader.draw(
+  //     page: page,
+  //     bounds: Rect.fromLTWH(10, y, pageSize.width - 20, double.infinity),
+  //   );
+  //   y = subHeaderResult!.bounds.bottom + 4;
+
+  //   final detail = PdfTextElement(text: "questionire.detail".tr(), font: font);
+  //   final detailResult = detail.draw(
+  //     page: page,
+  //     bounds: Rect.fromLTWH(10, y, pageSize.width - 20, double.infinity),
+  //   );
+  //   y = detailResult!.bounds.bottom + 4;
+
+  //   for (final q in widget.questions) {
+  //     String mainKey = "question${q.numberQuestion.tr()}_answer";
+  //     String questionText = q.question.tr();
+  //     String answerText = "-";
+
+  //     if (data.containsKey(mainKey) &&
+  //         data[mainKey] != null &&
+  //         data[mainKey].toString().isNotEmpty) {
+  //       answerText = data[mainKey].toString();
+  //     }
+
+  //     // -- แสดงคำถามหลัก --
+  //     final questionElement = PdfTextElement(
+  //       text: "${q.numberQuestion.tr()}• $questionText",
+  //       font: font,
+  //     );
+  //     final questionResult = questionElement.draw(
+  //       page: page,
+  //       bounds: Rect.fromLTWH(10, y, pageSize.width - 20, double.infinity),
+  //     );
+  //     y = questionResult!.bounds.bottom + 4;
+
+  //     // -- แสดงคำตอบหลัก --
+  //     final answerElement = PdfTextElement(
+  //       text: "Answer: $answerText",
+  //       font: font,
+  //     );
+  //     final answerResult = answerElement.draw(
+  //       page: page,
+  //       bounds: Rect.fromLTWH(20, y, pageSize.width - 30, double.infinity),
+  //     );
+  //     y = answerResult!.bounds.bottom + 8;
+
+  //     // -- ถ้ามี subQuestion ให้วนแสดงต่อ --
+  //     if (q.showSubQuestionOnYes) {
+  //       for (final sq in q.subQuestions) {
+  //         String subKey = "question${sq.numberQuestion.tr()}_answer";
+  //         String subQuestionText = sq.question.tr();
+  //         String subAnswerText = "-";
+
+  //         if (data.containsKey(subKey) &&
+  //             data[subKey] != null &&
+  //             data[subKey].toString().isNotEmpty) {
+  //           subAnswerText = data[subKey].toString();
+  //         }
+
+  //         final subQuestionElement = PdfTextElement(
+  //           text: "${sq.numberQuestion.tr()}• $subQuestionText",
+  //           font: font,
+  //         );
+  //         final subQuestionResult = subQuestionElement.draw(
+  //           page: page,
+  //           bounds: Rect.fromLTWH(10, y, pageSize.width - 20, double.infinity),
+  //         );
+  //         y = subQuestionResult!.bounds.bottom + 4;
+
+  //         final subAnswerElement = PdfTextElement(
+  //           text: "Answer: $subAnswerText",
+  //           font: font,
+  //         );
+  //         final subAnswerResult = subAnswerElement.draw(
+  //           page: page,
+  //           bounds: Rect.fromLTWH(20, y, pageSize.width - 30, double.infinity),
+  //         );
+  //         y = subAnswerResult!.bounds.bottom + 8;
+
+  //         // เช็ก overflow
+  //         if (y > pageSize.height - 40) {
+  //           page = document.pages.add();
+  //           y = 10;
+  //         }
+  //       }
+  //     }
+
+  //     // เพิ่มระยะห่างก่อนคำถามถัดไป
+  //     y += 8;
+
+  //     if (y > pageSize.height - 40) {
+  //       page = document.pages.add();
+  //       y = 10;
+  //     }
+  //   }
+
+  //   final bytes = await document.save();
+  //   document.dispose();
+  //   saveFile(bytes);
+  // }
+
+  Future<void> _exportPdfWithPdfPackage(Map<String, dynamic> data) async {
+    final fontData = await rootBundle.load('assets/fonts/THSarabunNew.ttf');
+    final ttf = pw.Font.ttf(fontData);
+
+    final pdf = pw.Document();
+
+    pdf.addPage(
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        build: (context) {
+          return [
+            pw.Center(
+              child: pw.Text(
+                'questionire.title'.tr(),
+                style: pw.TextStyle(
+                  font: ttf,
+                  fontSize: 32,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
+            ),
+            pw.SizedBox(height: 10),
+            pw.Text(
+              'questionire.subtitle'.tr(),
+              style: pw.TextStyle(font: ttf, fontSize: 24),
+            ),
+            pw.SizedBox(height: 5),
+            pw.Text(
+              'questionire.detail'.tr(),
+              style: pw.TextStyle(font: ttf, fontSize: 18),
+            ),
+            pw.SizedBox(height: 10),
+
+            // วนลูปคำถาม
+            ...widget.questions.expand((q) {
+              final mainKey = 'question${q.numberQuestion.tr()}_answer';
+              final questionText = q.question.tr();
+              final answerText =
+                  data[mainKey]?.toString().isNotEmpty == true
+                      ? data[mainKey].toString()
+                      : '-';
+
+              final widgets = <pw.Widget>[
+                pw.Text(
+                  "${q.numberQuestion.tr()} • $questionText",
+                  style: pw.TextStyle(font: ttf, fontSize: 18),
+                ),
+                pw.Text(
+                  "Answer: $answerText",
+                  style: pw.TextStyle(font: ttf, fontSize: 16),
+                ),
+                pw.SizedBox(height: 10),
+              ];
+
+              if (q.showSubQuestionOnYes) {
+                widgets.addAll(
+                  q.subQuestions.map((sq) {
+                    final subKey = 'question${sq.numberQuestion.tr()}_answer';
+                    final subQuestionText = sq.question.tr();
+                    final subAnswerText =
+                        data[subKey]?.toString().isNotEmpty == true
+                            ? data[subKey].toString()
+                            : '-';
+
+                    return pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Text(
+                          "${sq.numberQuestion.tr()} • $subQuestionText",
+                          style: pw.TextStyle(font: ttf, fontSize: 16),
+                        ),
+                        pw.Text(
+                          "Answer: $subAnswerText",
+                          style: pw.TextStyle(font: ttf, fontSize: 14),
+                        ),
+                        pw.SizedBox(height: 8),
+                      ],
+                    );
+                  }),
+                );
+              }
+
+              return widgets;
+            }),
+          ];
+        },
+      ),
+    );
+
+    final bytes = await pdf.save();
+
+    // ใช้ save หรือ share ตามต้องการ
+    saveFile(bytes);
+    await Printing.sharePdf(bytes: bytes, filename: 'questionnaire.pdf');
+  }
+}
+
+Future<void> saveFile(List<int> byte) async {
+  final blob = html.Blob([Uint8List.fromList(byte)]);
+  final url = html.Url.createObjectUrlFromBlob(blob);
+
+  final archor = html.AnchorElement(href: url)
+    ..setAttribute("download", "answer_map_${DateTime.now()}.pdf");
+  archor.click();
+  html.Url.revokeObjectUrl(url);
+}
+
+Future<void> saveFileMobile(List<int> bytes) async {
+  try {
+    final directory = await getApplicationDocumentsDirectory();
+    final filePath =
+        '${directory.path}/answer_map_${DateTime.now().millisecondsSinceEpoch}.pdf';
+    final file = File(filePath);
+
+    await file.writeAsBytes(bytes);
+    print('PDF saved to: $filePath');
+
+    // เปิดไฟล์ทันที (optional)
+    await OpenFile.open(filePath);
+  } catch (e) {
+    print('Error saving PDF: $e');
   }
 }

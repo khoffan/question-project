@@ -6,6 +6,7 @@ import 'package:questionnaire/model/question_model.dart';
 import 'package:questionnaire/widget/body_grid_canvas_widget.dart';
 import 'package:questionnaire/widget/choice_answer_widget.dart';
 import 'package:questionnaire/widget/level_pain_answer_widget.dart';
+import 'package:questionnaire/widget/weight_scale_slider_widget.dart';
 import 'package:questionnaire/widget/yes_no_question_widget.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -110,7 +111,11 @@ class _QuestionWidgetState extends State<QuestionWidget> {
                     const SizedBox(height: 40),
                 ],
               ] else if (widget.question.useBodyGrid) ...[
-                _bodyGrid(context, widget.question),
+                _bodyGrid(
+                  context,
+                  widget.question,
+                  data?[widget.question.numberQuestion.tr()],
+                ),
                 const SizedBox(height: 40),
               ] else if (widget.question.useChoice) ...[
                 _buildChoiceQuestion(
@@ -134,7 +139,24 @@ class _QuestionWidgetState extends State<QuestionWidget> {
     );
   }
 
-  Widget _bodyGrid(BuildContext context, Question question) {
+  Widget _bodyGrid(
+    BuildContext context,
+    Question question,
+    Map<String, dynamic>? data,
+  ) {
+    final front = data?["front"];
+    final back = data?["back"];
+    List<TapPointEntity> frontList = [];
+    List<TapPointEntity> backList = [];
+    if (data?.isNotEmpty ?? false) {
+      if (front is List && front.isNotEmpty) {
+        frontList = front.map((e) => TapPointEntity.fromMap(e)).toList();
+      }
+      if (back is List && back.isNotEmpty) {
+        backList = back.map((e) => TapPointEntity.fromMap(e)).toList();
+      }
+    }
+
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth <= 680) {
@@ -154,6 +176,7 @@ class _QuestionWidgetState extends State<QuestionWidget> {
                 imagePath: 'assets/images/body_front.png',
                 questionId: question.numberQuestion.tr(),
                 label: "front",
+                oldData: {"front": frontList},
                 onTap: (value) {
                   setState(() {
                     value.forEach((key, newPoints) {
@@ -176,6 +199,7 @@ class _QuestionWidgetState extends State<QuestionWidget> {
                 imagePath: 'assets/images/body_back.png',
                 questionId: question.numberQuestion.tr(),
                 label: "back",
+                oldData: {"back": backList},
                 onTap: (value) {
                   setState(() {
                     value.forEach((key, newPoints) {
@@ -216,6 +240,7 @@ class _QuestionWidgetState extends State<QuestionWidget> {
                   imagePath: 'assets/images/body_front.png',
                   questionId: question.numberQuestion.tr(),
                   label: "front",
+                  oldData: {"front": frontList, "back": backList},
                   onTap: (value) {
                     setState(() {
                       value.forEach((key, newPoints) {
@@ -237,6 +262,7 @@ class _QuestionWidgetState extends State<QuestionWidget> {
                   imagePath: 'assets/images/body_back.png',
                   questionId: question.numberQuestion.tr(),
                   label: "back",
+                  oldData: {"back": backList, "front": frontList},
                   onTap: (value) {
                     setState(() {
                       value.forEach((key, newPoints) {
@@ -374,19 +400,36 @@ class _QuestionWidgetState extends State<QuestionWidget> {
           ),
         ),
         const SizedBox(height: 40),
-        LavelPainWidget(
-          labelLeft: question.labelLeft.tr(),
-          labelRight: question.labelRight.tr(),
-          onPainSelected: (value) {
-            setState(() {
-              selectedPainValueMap[question.numberQuestion] = value;
-            });
+        WeightScaleSliderWidget(
+          from: 1,
+          max: 10,
+          initialValue:
+              valueLocal?.toDouble() ??
+              selectedPainValueMap[question.numberQuestion]?.toDouble() ??
+              1,
+          onChanged: (value) {
+            setState(
+              () =>
+                  selectedPainValueMap[question.numberQuestion] = value.toInt(),
+            );
+
             final painValue = selectedPainValueMap[question.numberQuestion];
             widget.onAnswer?.call(question.numberQuestion, painValue, parentId);
           },
-          initialPainValue:
-              valueLocal ?? selectedPainValueMap[question.numberQuestion],
         ),
+        // LavelPainWidget(
+        //   labelLeft: question.labelLeft.tr(),
+        //   labelRight: question.labelRight.tr(),
+        //   onPainSelected: (value) {
+        //     setState(() {
+        //       selectedPainValueMap[question.numberQuestion] = value;
+        //     });
+        //     final painValue = selectedPainValueMap[question.numberQuestion];
+        //     widget.onAnswer?.call(question.numberQuestion, painValue, parentId);
+        //   },
+        //   initialPainValue:
+        //       valueLocal ?? selectedPainValueMap[question.numberQuestion],
+        // ),
       ],
     );
   }
