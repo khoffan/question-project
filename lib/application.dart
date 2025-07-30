@@ -774,36 +774,36 @@ class _ApplicationState extends State<Application> {
     // ใช้ save หรือ share ตามต้องการ
     if (kIsWeb) {
       saveFile(bytes);
-    } else {
-      saveFileMobile(bytes);
     }
     await Printing.sharePdf(bytes: bytes, filename: 'questionnaire.pdf');
   }
 }
 
 Future<void> saveFile(List<int> byte) async {
-  final blob = html.Blob([Uint8List.fromList(byte)]);
+  final blob = html.Blob([Uint8List.fromList(byte)], 'application/pdf');
   final url = html.Url.createObjectUrlFromBlob(blob);
 
-  final archor = html.AnchorElement(href: url)
-    ..setAttribute("download", "answer_map_${DateTime.now()}.pdf");
-  archor.click();
-  html.Url.revokeObjectUrl(url);
+  html.window.open(url, "_blank");
+
+  // final archor = html.AnchorElement(href: url)
+  //   ..setAttribute("download", "answer_map_${DateTime.now()}.pdf");
+  // archor.click();
+  // html.Url.revokeObjectUrl(url);
 }
 
-Future<void> saveFileMobile(List<int> bytes) async {
-  try {
-    final directory = await getApplicationDocumentsDirectory();
-    final filePath =
-        '${directory.path}/answer_map_${DateTime.now().millisecondsSinceEpoch}.pdf';
-    final file = File(filePath);
+// Future<void> saveFileMobile(List<int> bytes) async {
+//   try {
+//     final directory = await getApplicationDocumentsDirectory();
+//     final filePath =
+//         '${directory.path}/answer_map_${DateTime.now().millisecondsSinceEpoch}.pdf';
+//     final file = File(filePath);
 
-    await file.writeAsBytes(bytes);
-    print('PDF saved to: $filePath');
+//     await file.writeAsBytes(bytes);
+//     print('PDF saved to: $filePath');
 
-    // เปิดไฟล์ทันที (optional)
-    await OpenFile.open(filePath);
-  } catch (e) {
-    print('Error saving PDF: $e');
-  }
-}
+//     // เปิดไฟล์ทันที (optional)
+//     await OpenFile.open(filePath);
+//   } catch (e) {
+//     print('Error saving PDF: $e');
+//   }
+// }
