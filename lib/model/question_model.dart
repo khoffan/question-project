@@ -1,5 +1,43 @@
 import 'package:equatable/equatable.dart';
 
+class FormModel {
+  final String formId;
+  final String userId;
+  final List<Question> questions;
+
+  const FormModel({
+    required this.formId,
+    required this.userId,
+    required this.questions,
+  });
+
+  factory FormModel.fromJson(Map<String, dynamic> json) {
+    return FormModel(
+      formId: json['form_id'] ?? "",
+      userId: json['user_id'] ?? "",
+      questions:
+          json['questions'] != null
+              ? List<Question>.from(
+                json['questions'].map((x) => Question.fromJson(x)),
+              )
+              : const [],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'form_id': formId,
+      'user_id': userId,
+      'questions': questions.map((x) => x.toJson()).toList(),
+    };
+  }
+
+  @override
+  String toString() {
+    return 'FormModel(formId: $formId, userId: $userId, questions: $questions)';
+  }
+}
+
 class Question extends Equatable {
   final String numberQuestion;
   final String question;

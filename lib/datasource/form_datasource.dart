@@ -22,7 +22,7 @@ class FormDataSourceImpl implements FormDataSource {
       return null;
     } catch (e) {
       debugPrint(e.toString());
-      return null;
+      return [];
     }
   }
 

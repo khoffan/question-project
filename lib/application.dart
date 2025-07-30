@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_line_liff/flutter_line_liff.dart';
 import 'package:questionnaire/cubit/answer_cubit.dart';
+import 'package:questionnaire/cubit/form_cubit.dart';
 import 'package:questionnaire/model/answer_model.dart';
 import 'package:questionnaire/model/question_model.dart';
 import 'package:questionnaire/widget/comment_box_widget.dart';
@@ -41,12 +42,12 @@ class _ApplicationState extends State<Application> {
   final ValueNotifier<String> _comment = ValueNotifier<String>("");
   bool _isReady = false;
 
+
   ScrollController scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-
     FlutterLineLiff.instance.ready.then((_) {
       debugPrint('Line ready');
       if (!FlutterLineLiff.instance.isLoggedIn) {
@@ -242,6 +243,11 @@ class _ApplicationState extends State<Application> {
 
   @override
   Widget build(BuildContext context) {
+    // if (_isLineReady) {
+    //   final profile = FlutterLineLiff.instance.profile;
+    //   print(profile);
+    // }
+
     context.locale;
     if (!_isReady) {
       return Scaffold(
