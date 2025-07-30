@@ -456,17 +456,18 @@ class _ApplicationState extends State<Application> {
                     "patient_name": _patientName,
                     ...modifiedAnsMap,
                   };
-                  context.read<AnswerCubit>().saveAllAnswerLocal(
-                    patientId: '',
-                    answers: sortedAnswers,
-                  );
-                  downloadJsonFIle(
-                    jsonEncode(combineMap),
-                    "answer_map_${_patientName}_${DateTime.now()}.json",
-                  );
-                  context.read<AnswerCubit>().clearAllAnswerLocal();
-                  isSubmit.value = false;
-                  setState(() {});
+                  // context.read<AnswerCubit>().saveAllAnswerLocal(
+                  //   patientId: '',
+                  //   answers: sortedAnswers,
+                  // );
+                  // downloadJsonFIle(
+                  //   jsonEncode(combineMap),
+                  //   "answer_map_${_patientName}_${DateTime.now()}.json",
+                  // );
+                  // context.read<AnswerCubit>().clearAllAnswerLocal();
+                  // isSubmit.value = false;
+                  // setState(() {});
+                  _exportPdfWithPdfPackage(combineMap);
                 },
                 child: Text('questionire.button.export_json'.tr()),
               ),
@@ -686,6 +687,12 @@ class _ApplicationState extends State<Application> {
 
     final pdf = pw.Document();
 
+    final baseStyle = pw.TextStyle(
+      font: ttf,
+      fontSize: 18,
+      fontWeight: pw.FontWeight.normal,
+    );
+
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
@@ -704,13 +711,14 @@ class _ApplicationState extends State<Application> {
             pw.SizedBox(height: 10),
             pw.Text(
               'questionire.subtitle'.tr(),
-              style: pw.TextStyle(font: ttf, fontSize: 24),
+              style: pw.TextStyle(
+                font: ttf,
+                fontSize: 24,
+                fontWeight: pw.FontWeight.bold,
+              ),
             ),
             pw.SizedBox(height: 5),
-            pw.Text(
-              'questionire.detail'.tr(),
-              style: pw.TextStyle(font: ttf, fontSize: 18),
-            ),
+            pw.Text('questionire.detail'.tr(), style: baseStyle),
             pw.SizedBox(height: 10),
 
             // วนลูปคำถาม
@@ -725,12 +733,9 @@ class _ApplicationState extends State<Application> {
               final widgets = <pw.Widget>[
                 pw.Text(
                   "${q.numberQuestion.tr()} • $questionText",
-                  style: pw.TextStyle(font: ttf, fontSize: 18),
+                  style: baseStyle,
                 ),
-                pw.Text(
-                  "Answer: $answerText",
-                  style: pw.TextStyle(font: ttf, fontSize: 16),
-                ),
+                pw.Text("Answer: $answerText", style: baseStyle),
                 pw.SizedBox(height: 10),
               ];
 
@@ -749,12 +754,9 @@ class _ApplicationState extends State<Application> {
                       children: [
                         pw.Text(
                           "${sq.numberQuestion.tr()} • $subQuestionText",
-                          style: pw.TextStyle(font: ttf, fontSize: 16),
+                          style: baseStyle,
                         ),
-                        pw.Text(
-                          "Answer: $subAnswerText",
-                          style: pw.TextStyle(font: ttf, fontSize: 14),
-                        ),
+                        pw.Text("Answer: $subAnswerText", style: baseStyle),
                         pw.SizedBox(height: 8),
                       ],
                     );
@@ -773,37 +775,29 @@ class _ApplicationState extends State<Application> {
 
     // ใช้ save หรือ share ตามต้องการ
     if (kIsWeb) {
-      saveFile(bytes);
+      _previewPdfFile(bytes);
     }
-    await Printing.sharePdf(bytes: bytes, filename: 'questionnaire.pdf');
+    // await Printing.sharePdf(bytes: bytes, filename: 'questionnaire.pdf');
   }
 }
 
-Future<void> saveFile(List<int> byte) async {
+Future<void> _previewPdfFile(List<int> byte) async {
   final blob = html.Blob([Uint8List.fromList(byte)], 'application/pdf');
   final url = html.Url.createObjectUrlFromBlob(blob);
 
-  html.window.open(url, "_blank");
+  // html.window.open(url, "_blank");
 
-  // final archor = html.AnchorElement(href: url)
-  //   ..setAttribute("download", "answer_map_${DateTime.now()}.pdf");
-  // archor.click();
+  final iframe =
+      html.IFrameElement()
+        ..src = url
+        ..style.border = 'none'
+        ..style.width = '100%'
+        ..style.height = '100vh';
+
+  // ใส่ iframe ลงใน div ที่มี id 'pdfContainer'
+  html.document.getElementById('pdfContainer')?.children.clear();
+  html.document.getElementById('pdfContainer')?.children.add(iframe);
+
+  // await Future.delayed(const Duration(seconds: 1));
   // html.Url.revokeObjectUrl(url);
 }
-
-// Future<void> saveFileMobile(List<int> bytes) async {
-//   try {
-//     final directory = await getApplicationDocumentsDirectory();
-//     final filePath =
-//         '${directory.path}/answer_map_${DateTime.now().millisecondsSinceEpoch}.pdf';
-//     final file = File(filePath);
-
-//     await file.writeAsBytes(bytes);
-//     print('PDF saved to: $filePath');
-
-//     // เปิดไฟล์ทันที (optional)
-//     await OpenFile.open(filePath);
-//   } catch (e) {
-//     print('Error saving PDF: $e');
-//   }
-// }
