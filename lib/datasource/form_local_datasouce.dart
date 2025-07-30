@@ -48,7 +48,10 @@ class FormLocalDataSourceImpl implements FormLocalDataSource {
       final endcode = jsonEncode(formAnswer.map((e) => e.toJson()).toList());
       // print(endcode);
 
-      await _sharedPrefService.setString("answers_$patientId", endcode);
+      await _sharedPrefService.setString(
+        "answers_${patientId}_${DateTime.now().microsecond}",
+        endcode,
+      );
     } catch (e) {
       debugPrint("save answer local error: $e");
     }
