@@ -698,6 +698,11 @@ class _ApplicationState extends State<Application> {
         pageFormat: PdfPageFormat.a4,
         build: (context) {
           return [
+            pw.Align(
+              alignment: pw.Alignment.topRight,
+              child: pw.Text("Patient Name $_patientName"),
+            ),
+            pw.Divider(),
             pw.Center(
               child: pw.Text(
                 'questionire.title'.tr(),
@@ -787,17 +792,21 @@ Future<void> _previewPdfFile(List<int> byte) async {
 
   // html.window.open(url, "_blank");
 
-  final iframe =
-      html.IFrameElement()
-        ..src = url
-        ..style.border = 'none'
-        ..style.width = '100%'
-        ..style.height = '100vh';
+  html.AnchorElement(href: url)
+    ..target = '_blank'
+    ..click();
 
-  // ใส่ iframe ลงใน div ที่มี id 'pdfContainer'
-  html.document.getElementById('pdfContainer')?.children.clear();
-  html.document.getElementById('pdfContainer')?.children.add(iframe);
+  // final iframe =
+  //     html.IFrameElement()
+  //       ..src = url
+  //       ..style.border = 'none'
+  //       ..style.width = '100%'
+  //       ..style.height = '100vh';
 
-  // await Future.delayed(const Duration(seconds: 1));
-  // html.Url.revokeObjectUrl(url);
+  // // ใส่ iframe ลงใน div ที่มี id 'pdfContainer'
+  // html.document.getElementById('pdfContainer')?.children.clear();
+  // html.document.getElementById('pdfContainer')?.children.add(iframe);
+
+  await Future.delayed(const Duration(seconds: 10));
+  html.Url.revokeObjectUrl(url);
 }
